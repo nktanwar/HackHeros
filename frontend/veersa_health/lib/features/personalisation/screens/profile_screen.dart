@@ -13,120 +13,139 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize Controller
     final controller = Get.put(ProfileController());
 
     return Scaffold(
-      backgroundColor: ColorConstants.backgroundColor, // White background
+      backgroundColor: ColorConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        automaticallyImplyLeading: false, // Hide back button on main tab
         title: Text(
           "Profile",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold, 
-            color: Colors.black,
-          ),
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(SizeConstants.defaultSpace),
-          child: Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    // Circular Avatar
-                    Obx(() => Container(
-                      padding: const EdgeInsets.all(4), 
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ColorConstants.primaryBrandColor,
-                          width: 2,
-                        )
-                      ),
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage(controller.userProfileImage.value),
-                        backgroundColor: Colors.grey.shade200,
-                      ),
-                    )),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Name
-                    Obx(() => Text(
-                      controller.userName.value,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                    )),
-                    
-                    const SizedBox(height: 4),
-                    
-                    // Email
-                    Obx(() => Text(
-                      controller.userEmail.value,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                    )),
+      body: RefreshIndicator(
+        onRefresh: controller.fetchUserProfile, // Add Pull-to-refresh
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(SizeConstants.defaultSpace),
+            child: Column(
+              children: [
+                // --- 1. Profile Header (Reactive) ---
+                SizedBox(
+                  width: double.infinity,
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return Column(
+                      children: [
+                        // Avatar
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: ColorConstants.primaryBrandColor,
+                              width: 2,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: AssetImage(controller.profileImage.value),
+                            backgroundColor: Colors.grey.shade200,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
 
-                    const SizedBox(height: 4),
+                        // Name from API
+                        Text(
+                          controller.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
 
-                    // Phone Number
-                     Obx(() => Text(
-                      controller.userPhone.value,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.black87, 
-                        fontWeight: FontWeight.w600
-                      ),
-                    )),
-                  ],
+                        // Email from API
+                        Text(
+                          controller.email,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 4),
+
+                        // Phone from API
+                        if (controller.phone.isNotEmpty)
+                          Text(
+                            controller.phone,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                      ],
+                    );
+                  }),
                 ),
-              ),
-              const SizedBox(height: 32),
-              const Divider(),
-              const SizedBox(height: 16),
 
-              // --- 3. Menu Options ---
-              
-              // Notifications
-              ProfileMenuTile(
-                icon: Iconsax.notification,
-                title: 'Notifications',
-                onPress: () => Get.to(() => const NotificationScreen()),
-              ),
-              
-              const SizedBox(height: 10),
+                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 16),
 
-              // My Appointments
-              ProfileMenuTile(
-                icon: Iconsax.calendar_tick,
-                title: 'My Appointments',
-                onPress: () => Get.to(() => AppointmentScreen()), 
-              ),
+                // --- 2. Menu Options ---
+                ProfileMenuTile(
+                  icon: Iconsax.notification,
+                  title: 'Notifications',
+                  onPress: () => Get.to(() => const NotificationScreen()),
+                ),
+                const SizedBox(height: 10),
+                ProfileMenuTile(
+                  icon: Iconsax.calendar_tick,
+                  title: 'My Appointments',
+                  onPress: () => Get.to(() => AppointmentScreen()),
+                ),
 
-              const SizedBox(height: 32),
-              const Divider(),
-              const SizedBox(height: 20),
+                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 20),
 
-              // --- 4. Logout Button ---
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => controller.logout(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: Colors.red),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.w600),
+                // --- 3. Logout Button ---
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => controller.logout(),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Colors.red),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text(
+                      "Logout",
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

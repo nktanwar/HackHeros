@@ -17,35 +17,39 @@ class HomeAppBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Location",
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: ColorConstants.secondaryText,
-                      fontSize: 14,
-                    ),
+Widget build(BuildContext context) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      // --- LEFT SIDE: LOCATION ---
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center, // Vertically center within the Appbar
+          children: [
+            Text(
+              "Location",
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: ColorConstants.darkGrey, // Ensure label is subtle
               ),
-              const SizedBox(height: 4),
-              InkWell(
-                onTap: controller.refreshLocation,
-                borderRadius: BorderRadius.circular(8),
+            ),
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: controller.initializeData,
+              borderRadius: BorderRadius.circular(8), // Polished touch area
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2.0), // Hit target padding
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.min, // Keep ripple tight to content
                   children: [
                     const Icon(
                       Iconsax.location,
                       color: ColorConstants.primaryBrandColor,
-                      size: 25,
+                      size: 20, // Slightly smaller usually looks cleaner in headers
                     ),
                     const SizedBox(width: 6),
                     
+                    // REACTIVE LOCATION TEXT OR LOADER
                     Obx(() {
                       if (controller.isFetchingLocation.value) {
                         return const SizedBox(
@@ -56,28 +60,37 @@ class HomeAppBar extends StatelessWidget {
                       }
                       return Flexible(
                         child: Text(
-                          controller.currentLocation.value,
+                          controller.address.value.isEmpty 
+                              ? "Select Location" 
+                              : controller.address.value,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: ColorConstants.black,
                           ),
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       );
                     }),
+                    
                     const SizedBox(width: 4),
                     
                     Obx(() => controller.isFetchingLocation.value
                         ? const SizedBox.shrink()
-                        : const Icon(Icons.keyboard_arrow_down,
-                            color: ColorConstants.darkGrey)),
+                        : const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: ColorConstants.darkGrey,
+                            size: 18,
+                          )
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
         Container(
           decoration: BoxDecoration(
             color: ColorConstants.grey,

@@ -1,40 +1,54 @@
-enum AppointmentStatus { upcoming, completed, cancelled }
+import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
-class Appointment {
+enum AppointmentStatus { BOOKED, COMPLETED, CANCELLED }
+
+class AppointmentModel {
   final String id;
-  final String doctorName;
-  final String specialty;
-  final String doctorImageUrl; 
-  final String phoneNumber;
-  final DateTime appointmentDate;
+  final String doctorId;
+  final String patientId;
+  final DateTime startTime;
+  final DateTime endTime;
+  final AppointmentStatus status;
+  
+  // UI Helpers (If backend doesn't send these, we default them or fetch separately)
+  final String doctorName; 
   final String clinicName;
   final String address;
-  final AppointmentStatus status;
+  final String doctorImage;
+  final String specialty;
 
-  Appointment({
+  AppointmentModel({
     required this.id,
-    required this.doctorName,
-    required this.specialty,
-    required this.doctorImageUrl,
-    required this.phoneNumber,
-    required this.appointmentDate,
-    required this.clinicName,
-    required this.address,
+    required this.doctorId,
+    required this.patientId,
+    required this.startTime,
+    required this.endTime,
     required this.status,
+    this.doctorName = "Dr. Veersa Specialist", // Placeholder if API doesn't populate
+    this.clinicName = "Veersa Health Clinic",
+    this.address = "123 Health St, Panipat",
+    this.doctorImage = ImageStringsConstants.avatar3,
+    this.specialty = "General Physician",
   });
 
-  
-  factory Appointment.fromJson(Map<String, dynamic> json) {
-    return Appointment(
-      id: json['id'],
-      doctorName: json['doctor_name'],
-      specialty: json['specialty'],
-      doctorImageUrl: json['image_url'],
-      phoneNumber: json['phone'],
-      appointmentDate: DateTime.parse(json['date']),
-      clinicName: json['clinic_name'],
-      address: json['address'],
-      status: AppointmentStatus.values.byName(json['status']),
+  factory AppointmentModel.fromJson(Map<String, dynamic> json) {
+    return AppointmentModel(
+      id: json['id'] ?? '',
+      doctorId: json['doctorId'] ?? '',
+      patientId: json['patientId'] ?? '',
+      startTime: DateTime.parse(json['startTime']),
+      endTime: DateTime.parse(json['endTime']),
+      status: _parseStatus(json['status']),
+      // If your backend eventually sends populated DTOs, map them here:
+      // doctorName: json['doctorName'] ?? "Unknown",
     );
+  }
+
+  static AppointmentStatus _parseStatus(String? status) {
+    switch (status?.toUpperCase()) {
+      case 'COMPLETED': return AppointmentStatus.COMPLETED;
+      case 'CANCELLED': return AppointmentStatus.CANCELLED;
+      default: return AppointmentStatus.BOOKED;
+    }
   }
 }

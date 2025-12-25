@@ -12,7 +12,12 @@ class ScheduleAppointmentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialize Controller
     final controller = Get.put(AppointmentController());
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = Get.arguments;
+      if (args != null && args['doctorId'] != null) {
+        controller.initBooking(args['doctorId']);
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text("Book Appointment"),
@@ -93,20 +98,8 @@ class ScheduleAppointmentScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     
-                    // The Grid Widget
                     const TimeSlotGrid(),
-                    
                     const SizedBox(height: 24),
-                    
-                    // Legend (Visual Guide)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildLegendItem(const Color(0xFF258099), "Selected"),
-                        _buildLegendItem(Colors.grey.shade200, "Disabled", textColor: Colors.grey),
-                        _buildLegendItem(Colors.white, "Available", hasBorder: true),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -126,25 +119,6 @@ class ScheduleAppointmentScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  // Helper widget for the legend
-  Widget _buildLegendItem(Color color, String text, {bool hasBorder = false, Color textColor = Colors.black}) {
-    return Row(
-      children: [
-        Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: hasBorder ? Border.all(color: Colors.grey) : null,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(text, style: TextStyle(fontSize: 12, color: textColor)),
-      ],
     );
   }
 }

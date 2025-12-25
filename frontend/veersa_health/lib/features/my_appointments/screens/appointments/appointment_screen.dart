@@ -11,6 +11,7 @@ class AppointmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(AppointmentController());
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -52,7 +53,21 @@ class AppointmentScreen extends StatelessWidget {
                   : controller.previousAppointments;
 
               if (appointments.isEmpty) {
-                return const Center(child: Text("No appointments found"));
+              return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.calendar_today, size: 50, color: Colors.grey),
+                      const SizedBox(height: 10),
+                      Text(
+                        controller.selectedTab.value == 0 
+                          ? "No upcoming appointments" 
+                          : "No history found",
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               return ListView.builder(
@@ -60,28 +75,14 @@ class AppointmentScreen extends StatelessWidget {
                 itemCount: appointments.length,
                 itemBuilder: (context, index) {
                   final appointment = appointments[index];
-                  // Add headers "Upcoming" or "Previous" if needed like in design
-                  // For now, we list the cards directly as per standard list behavior
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Optional: Show label "Upcoming" or "Previous" at top of list only
-                      if (index == 0) 
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12, left: 4),
-                          child: Text(
-                            controller.selectedTab.value == 0 ? "Upcoming" : "Previous", 
-                            style: const TextStyle(
-                              fontSize: 16, 
-                              fontWeight: FontWeight.w600, 
-                              color: Colors.black54
-                            )
-                          ),
-                        ),
                       AppointmentCard(
                         appointment: appointment,
                         onTap: () => Get.to(() => const AppointmentDetailScreen(), arguments: appointment),
-                        ),
+                      ),
+                      const SizedBox(height: 12),
                     ],
                   );
                 },

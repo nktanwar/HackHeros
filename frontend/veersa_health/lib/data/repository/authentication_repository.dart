@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:veersa_health/data/service/api_service.dart';
 import 'package:veersa_health/features/authentication/models/auth_model.dart';
 import 'package:veersa_health/features/authentication/screens/login/login_screen.dart';
@@ -123,7 +124,7 @@ class AuthenticationRepository extends GetxController {
       );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        print('User granted permission');
+        debugPrint('User granted permission');
         
         // 2. Get Token
         String? token = await messaging.getToken();
@@ -134,31 +135,64 @@ class AuthenticationRepository extends GetxController {
             '/api/devices/register', 
             data: {"token": token},
           );
-          print("FCM Token Registered: $token");
+          debugPrint("FCM Token Registered: $token");
           
           // 4. Listen for Foreground Messages
-          FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-            print('Got a message whilst in the foreground!');
-            print('Message data: ${message.data}');
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          _handleForegroundNotification(message);
+        });
 
-            if (message.notification != null) {
-              // Show a local notification (Snackbar or Dialog)
-              Get.snackbar(
-                message.notification!.title ?? 'Notification',
-                message.notification!.body ?? 'You have a new message',
-                snackPosition: SnackPosition.TOP,
-                backgroundColor: Colors.white,
-                colorText: Colors.black,
-                icon: const Icon(Icons.notifications, color: Colors.blue),
-              );
-            }
-          });
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+          _handleNotificationTap(message.data);
+        });
+
+        // 5. Handle Terminated State Tap
+        FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+          if (message != null) {
+            _handleNotificationTap(message.data);
+          }
+        });
         }
       } else {
-        print('User declined or has not accepted permission');
+        debugPrint('User declined or has not accepted permission');
       }
     } catch (e) {
-      print("Failed to register FCM token: $e");
+      debugPrint("Failed to register FCM token: $e");
+    }
+  }
+
+  void _handleForegroundNotification(RemoteMessage message) {
+    // Determine title/body from data payload if notification block is empty (Data-only payload)
+    String title = message.notification?.title ?? "New Notification";
+    String body = message.notification?.body ?? "";
+
+    if (message.data.isNotEmpty) {
+      final type = message.data['type'];
+      if (type == 'APPOINTMENT_REMINDER') {
+        title = "Appointment Reminder";
+        body = "You have an upcoming appointment. Tap to view location.";
+      }
+    }
+
+    Get.snackbar(
+      title,
+      body,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.white,
+      colorText: Colors.black,
+      icon: const Icon(Icons.notifications_active, color: Colors.blue),
+      onTap: (_) => _handleNotificationTap(message.data), // Handle tap on snackbar
+      duration: const Duration(seconds: 5),
+    );
+  }
+  Future<void> _handleNotificationTap(Map<String, dynamic> data) async {
+    if (data['mapUrl'] != null) {
+      final Uri url = Uri.parse(data['mapUrl']);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        Get.snackbar("Error", "Could not open map");
+      }
     }
   }
   // 5. Logout

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:veersa_health/features/notifications/controllers/notification_controller.dart';
+import 'package:veersa_health/features/notifications/models/notificaton_model.dart';
 import 'package:veersa_health/features/notifications/screens/widgets/notification_card.dart';
-import 'package:veersa_health/features/notifications/screens/notification_detail_screen.dart'; 
 import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class NotificationScreen extends StatelessWidget {
@@ -10,13 +10,13 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final controller = Get.put(NotificationController());
 
     return Scaffold(
       backgroundColor: ColorConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: ColorConstants.backgroundColor,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Get.back(),
@@ -25,161 +25,51 @@ class NotificationScreen extends StatelessWidget {
         title: const Text(
           "Notifications",
           style: TextStyle(
-              color: ColorConstants.primaryTextColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18),
+            color: ColorConstants.primaryTextColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
       ),
       body: Obx(() {
-        return Column(
-          children: [
-            
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      _buildTabButton(
-                        text: "Unread",
-                        count: controller.unreadList.length,
-                        isActive: true,
-                      ),
-                      const SizedBox(width: 10),
-                      _buildTabButton(
-                        text: "Read",
-                        count: controller.readList.length,
-                        isActive: false,
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: controller.markAllAsRead,
-                    child: const Text(
-                      "Mark All as Read",
-                      style: TextStyle(
-                          color: ColorConstants.primaryBrandColor, fontSize: 12),
-                    ),
-                  )
-                ],
-              ),
-            ),
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-            
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    
-                    if (controller.unreadList.isNotEmpty) ...[
-                      ...controller.unreadList.map((model) => GestureDetector(
-                            onTap: () {
-                              Get.to(() =>
-                                  NotificationDetailScreen(notification: model));
-                            },
-                            child: NotificationCard(
-                              isUnread: true,
-                              title: model.title,
-                              description: model.description,
-                              timeAgo: model.timeAgo,
-                              dateTime: model.dateTime,
-                            ),
-                          )),
-                    ],
-
-                    const SizedBox(height: 10),
-
-                    
-                    if (controller.readList.isNotEmpty) ...[
-                      
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Read",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2C3545),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: controller.clearAllRead,
-                            child: const Text(
-                              "Clear All",
-                              style: TextStyle(
-                                  color: ColorConstants.primaryBrandColor),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-
-                      
-                      ...controller.readList.map((model) => GestureDetector(
-                            onTap: () {
-                              Get.to(() =>
-                                  NotificationDetailScreen(notification: model));
-                            },
-                            child: NotificationCard(
-                              isUnread: false,
-                              title: model.title,
-                              description: model.description,
-                              timeAgo: model.timeAgo,
-                              dateTime: model.dateTime,
-                              iconData: model.iconData,
-                            ),
-                          )),
-                    ]
-                  ],
+        if (controller.notifications.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.notifications_off_outlined, size: 60, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  "No notifications yet",
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
                 ),
-              ),
+              ],
             ),
-          ],
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: controller.fetchNotifications,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: controller.notifications.length,
+            itemBuilder: (context, index) {
+              final notification = controller.notifications[index];
+              
+              return NotificationCard(
+                title: controller.getTitle(notification),
+                description: controller.getDescription(notification),
+                dateTime: controller.formatTime(notification.scheduledAt),
+                isReminder: notification.type == NotificationType.APPOINTMENT_REMINDER,
+              );
+            },
+          ),
         );
       }),
-    );
-  }
-
-  
-  Widget _buildTabButton(
-      {required String text, required int count, required bool isActive}) {
-    const activeColor = Color(0xFF558BAA);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? activeColor : const Color(0xFFF5F7FA),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.grey[600],
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: isActive ? Colors.white.withAlpha(54) : Colors.grey[300],
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              count.toString(),
-              style: TextStyle(
-                color: isActive ? Colors.white : Colors.grey[600],
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
