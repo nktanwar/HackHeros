@@ -38,9 +38,9 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // 2. Search Bar Widget
-                HomeSearchBar(
-                  onSearchTap: () => Get.to(() => const SearchScreen(showFilterBottom: false)),
-                  onFilterTap: () => Get.to(() => const SearchScreen(showFilterBottom: true)),
+               HomeSearchBar(
+                  onSearchTap: () => Get.to(() => const SearchScreen()), 
+                  onFilterTap: () => Get.to(() => const SearchScreen(), arguments: {'openFilter': true}),
                 ),
 
                 const SizedBox(height: 24),
@@ -57,21 +57,33 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // 4. Doctor Speciality Section
-                const SectionHeadingWithButton(
+                SectionHeadingWithButton(
                   sectionHeading: "Doctor Speciality",
                   isButtonVisible: true,
                   buttonText: "View All",
+                  onPressed: () => Get.to(
+                    () => const SearchScreen(), 
+                  ),
                 ),
                 const SizedBox(height: 16),
-                const DoctorSpecialityList(),
+                DoctorSpecialityList(
+                   onItemTap: (specialityName) => Get.to(
+                     () => const SearchScreen(), 
+                     arguments: {'speciality': specialityName} // Case 2 Argument
+                   ),
+                ),
 
                 const SizedBox(height: 24),
 
                 // 5. Nearby Doctors Section
-                const SectionHeadingWithButton(
+                SectionHeadingWithButton(
                   sectionHeading: "Nearby Doctors",
                   isButtonVisible: true,
                   buttonText: "View All",
+                  onPressed: () => Get.to(
+                    () => const SearchScreen(), 
+                    arguments: {'sortBy': 'distance'} // Case 3 Argument
+                  ),
                 ),
                 const SizedBox(height: 16),
                 const NearbyDoctorsList(),

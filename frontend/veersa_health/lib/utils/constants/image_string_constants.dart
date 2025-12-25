@@ -150,5 +150,11 @@ class ImageStringsConstants {
     'assets/images/doctors_speciality/PhysicalTherapy.png',
     'assets/images/doctors_speciality/ENT.png',
   ];
-
+    static String getNameFromAddress(String address) {
+    List<String> name = address.split('/');
+    return name[name.length-1].split('.')[0];
+  }
+  static final List<Map<String, String>> specialities = ImageStringsConstants.doctorSpecialityIconsList
+        .map((image) => {'name': getNameFromAddress(image), 'icon': image})
+        .toList();
 }

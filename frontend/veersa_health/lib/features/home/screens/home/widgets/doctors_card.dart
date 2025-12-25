@@ -139,7 +139,7 @@ class DoctorCard extends StatelessWidget {
                 backgroundColor: ColorConstants.primaryBrandColor,
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(6.0),
                 ),
               ),
               child: const Text(
