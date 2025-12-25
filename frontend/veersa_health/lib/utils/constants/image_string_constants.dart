@@ -4,6 +4,7 @@ class ImageStringsConstants {
   //  App logo
   static const String logo = 'assets/logo/logo.png';
   static const String appLogo = "assets/logo/app_logo.png";
+  static const String appIcon = "assets/logo/app_icon.png";
   //On boarding
   static const String onBoardingImage1 =
       'assets/images/onboarding/first_onboarding.png';
@@ -25,7 +26,7 @@ class ImageStringsConstants {
   //Signup and succes
   static const String enterOtp = 'assets/images/signup/enter_otp.png';
   static const String accountCreated =
-      'assets/images/signup/account_created.gif';
+      'assets/images/signup/account_created.png';
 
   //bookings Page
   static const String bookingSuccess =

@@ -22,9 +22,9 @@ class TextStringsConstants {
   static const String forgetPassword = "Forget Password?";
   static const String login = "LOGIN";
   static const String createAccount = "Create Account";
-  static const String iAgreeTo = "I agree to";
+  static const String iAgreeTo = "I agree to the";
   static const String privacyPolicy = "Privacy Policy";
-  static const String termsOfUse = "Terms of use";
+  static const String termsOfservice = "Terms of service";
   static const String verifyEmailAddressTitle = "Verify Email Address";
   static const String verifyEmailAddressSubtitle =
       "A 6 digit code has been sent to:";
@@ -32,18 +32,22 @@ class TextStringsConstants {
   static const String enterVerificationCode =
       "Enter the veirfication code here";
   static const String notGetTheCode = "Didn’t get the code? Resend in ";
+  static const String passwordUpdateSuccessTitle = "Password Updated Successfully";
+  static const String passwordUpdateSuccessSubtitle = "Your password has been changed. You can now log in with your new password.";
   //Authentication Page Text
   static const String loginTitle = "Welcome to Veersa Health";
-  static const String loginSubTitle = "Log in to manage your appointments and access healthcare anytime, anywhere.";
+  static const String loginSubTitle =
+      "Log in to manage your appointments and access healthcare anytime, anywhere.";
   static const String signupTitle = "Create Your Account";
-  static const String signupSubTitle = "Sign up to book appointments, receive reminders, and manage your healthcare easily.";
+  static const String signupSubTitle =
+      "Sign up to book appointments, receive reminders, and manage your healthcare easily.";
 
   static const String forgetPasswordTitle = "Forget password";
   static const String forgetPasswordSubTitle =
       "No worries. Enter your registered email and we’ll help you reset it.";
 
-  static const String yourAccountCreatedTitle =
-      "Welcome to Veersa Health";
+  static const String yourAccountCreatedTitle = "Welcome to Veersa Health";
   static const String yourAccountCreatedSubTitle =
       "Your account has been created successfully. You can now access doctors and book appointments anytime.";
+
 }

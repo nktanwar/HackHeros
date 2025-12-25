@@ -14,7 +14,7 @@ class CustomTextFormField extends StatefulWidget {
     this.obscureText,
     this.obscuringCharacter,
     this.validator,
-    this.showOutlineBorder = false,
+    this.showOutlineBorder = true,
     this.keyboardType,
     this.readOnly, this.onTap,
   });
@@ -51,16 +51,16 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           left: SizeConstants.defaultSpace - 16,
           right: SizeConstants.defaultSpace - 16,
           top: SizeConstants.defaultSpace - 16,
-          bottom: SizeConstants.defaultSpace - 20,
+          bottom: SizeConstants.defaultSpace - 8,
         ),
-        height: SizeConstants.buttonHeight + 50,
+        height: SizeConstants.buttonHeight,
         decoration: BoxDecoration(
           color: ColorConstants.whiteBackground,
           border: BoxBorder.all(
             color: hasFocused || widget.showOutlineBorder!
                 ? ColorConstants.primaryBrandColor
                 : Colors.transparent,
-            width: hasFocused || widget.showOutlineBorder! ? 2 : 0,
+            width: hasFocused?2: widget.showOutlineBorder! ? 1 : 0,
           ),
           borderRadius: BorderRadius.all(
             Radius.circular(SizeConstants.inputFieldRadius),

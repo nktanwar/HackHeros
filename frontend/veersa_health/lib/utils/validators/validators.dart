@@ -43,4 +43,14 @@ class Validators {
     }
     return null;
   }
+
+  static String? validatePhoneNumber(String? phoneNumber) {
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      return "Phone number is required";
+    }
+    if (phoneNumber.length != 10 || !RegExp(r'^\d{10}$').hasMatch(phoneNumber)) {
+      return "Phone number must be 10 digits";
+    }
+    return null;
+  }
 }

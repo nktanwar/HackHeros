@@ -11,15 +11,12 @@ class CustomElevatedButtonTheme {
     style: ElevatedButton.styleFrom(
       elevation: SizeConstants.buttonElevation, 
       backgroundColor: ColorConstants.primaryBrandColor, 
-      foregroundColor: ColorConstants.primaryBrandColor, 
+      foregroundColor: ColorConstants.cardBackgroundColor, 
       
       disabledBackgroundColor: ColorConstants.secondaryText.withAlpha(127),
       disabledForegroundColor: ColorConstants.white.withAlpha(127),
       side: BorderSide.none, 
-      padding: const EdgeInsets.symmetric(
-        vertical: SizeConstants.buttonHeight, 
-      ),
-      textStyle:  const TextStyle().copyWith(
+      textStyle:  const TextStyle(
       fontSize: 20,
       fontFamily: "Montserrat",
       fontWeight: FontWeight.w700,
