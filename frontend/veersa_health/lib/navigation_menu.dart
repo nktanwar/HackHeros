@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:veersa_health/features/home/screens/home/home_screen.dart';
-import 'package:veersa_health/features/my_appointments/screens/appointment_screen.dart';
+import 'package:veersa_health/features/my_appointments/screens/appointments/appointment_screen.dart';
 import 'package:veersa_health/features/notifications/screens/notification_screen.dart';
 import 'package:veersa_health/features/personalisation/screens/profile_screen.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';

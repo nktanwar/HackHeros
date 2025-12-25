@@ -9,6 +9,7 @@ import 'package:veersa_health/features/home/screens/home/widgets/home_search_bar
 import 'package:veersa_health/features/home/screens/home/widgets/near_by_doctor_list.dart';
 import 'package:veersa_health/features/home/screens/home/widgets/upcoming_schedule_list.dart';
 import 'package:veersa_health/features/home/screens/search/search_screen.dart';
+import 'package:veersa_health/features/my_appointments/screens/appointments/appointment_screen.dart';
 import 'package:veersa_health/features/notifications/screens/notification_screen.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 
@@ -46,10 +47,11 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // 3. Upcoming Schedule Section
-                const SectionHeadingWithButton(
+                SectionHeadingWithButton(
                   sectionHeading: "Upcoming Schedule",
                   isButtonVisible: true,
                   buttonText: "View All",
+                  onPressed: () => Get.to(AppointmentScreen()),
                 ),
                 const SizedBox(height: 16),
                 const UpcomingScheduleList(),

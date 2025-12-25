@@ -36,12 +36,8 @@ class HelperFunctions {
     return MediaQuery.of(Get.context!).size.width;
   }
   
-  // static int calculateAge(DateTime dob) {
-  //   final now = DateTime.now();
-  //   int age = now.year - dob.year;
-  //   if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
-  //     age--;
-  //   }
-  //   return age < 0 ? 0 : age;
-  // }
+ static String formatDate(DateTime date) {
+    final time = "${date.hour > 12 ? date.hour - 12 : date.hour}:${date.minute.toString().padLeft(2, '0')} ${date.hour >= 12 ? 'PM' : 'AM'}";
+    return "Date: ${date.day}/${date.month}/${date.year} at $time";
+  }
 }
