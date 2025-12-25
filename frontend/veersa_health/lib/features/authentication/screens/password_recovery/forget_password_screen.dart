@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:veersa_health/common/widgets/buttons/custom_elevated_button.dart';
 import 'package:veersa_health/common/widgets/input_fields/custom_text_form_field.dart';
 import 'package:veersa_health/features/authentication/controllers/password_recovery_controller/forget_password_controller.dart';
-import 'package:veersa_health/features/authentication/screens/password_recovery/otp_verification_screen.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/size_constants.dart';
 import 'package:veersa_health/utils/constants/text_string_constant.dart';
@@ -64,7 +63,7 @@ class ForgetPasswordScreen extends StatelessWidget {
               SizedBox(height: 2*SizeConstants.spaceBtwSections),
               CustomElevatedButton(
                 // onPressed: () {},
-                onPressed: () => Get.to(OtpVerificationScreen()),
+                onPressed: () => controller.sendPasswordResetEmail(),
                 child: const Text("NEXT"),
               ),
              

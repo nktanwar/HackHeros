@@ -1,6 +1,6 @@
 
 import 'package:get/get.dart';
-import 'package:veersa_health/features/home/model/doctor_model.dart';
+import 'package:veersa_health/features/home/models/doctor_model.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
 enum SortOption { lowestFees, nearest }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:veersa_health/common/widgets/buttons/custom_elevated_button.dart';
 import 'package:veersa_health/common/widgets/input_fields/custom_text_form_field.dart';
+import 'package:veersa_health/features/authentication/controllers/password_recovery_controller/new_password_controller.dart';
 import 'package:veersa_health/features/authentication/screens/password_recovery/password_success_screen.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/size_constants.dart';
@@ -14,6 +14,7 @@ class PasswordResetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(NewPasswordController());
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -31,8 +32,6 @@ class PasswordResetScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
 
-              // FIX: Removed Expanded widget here. 
-              // Just use the Column directly.
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -66,7 +65,7 @@ class PasswordResetScreen extends StatelessWidget {
               CustomTextFormField(
                 label: "Confirm Password",
                 suffixIcon: Icon(Iconsax.eye_slash),
-                hintText: "Enter your old password",
+                hintText: "Re-enter your password",
                 prefixIcon: Iconsax.password_check,
                 obscuringCharacter: "*",
                 validator: Validators.validatePassword,

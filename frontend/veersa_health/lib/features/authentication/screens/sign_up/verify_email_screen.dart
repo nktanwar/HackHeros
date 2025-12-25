@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:veersa_health/common/widgets/buttons/custom_elevated_button.dart';
-import 'package:veersa_health/features/authentication/screens/sign_up/sign_up_success.dart';
+import 'package:veersa_health/features/authentication/controllers/sign_up/verify_email_controller.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 import 'package:veersa_health/utils/constants/size_constants.dart';
@@ -14,6 +13,7 @@ class VerifyEmailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(VerifyEmailController());
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -98,6 +98,7 @@ class VerifyEmailScreen extends StatelessWidget {
                     height: 50,
                     child: TextFormField(
                       onChanged: (value) {
+                        controller.setOtpDigit(index, value);
                         if (value.length == 1 && index < 5) {
                           FocusScope.of(context).nextFocus();
                         } else if (value.isEmpty && index > 0) {
@@ -138,19 +139,22 @@ class VerifyEmailScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              const Text(
-                "Didn’t get the code? Resend in 00:27",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: ColorConstants.primaryTextColor,
+              Obx(
+                () => Text(
+                  controller.remainingTime.value > 0
+                      ? "Resend in 00:${controller.remainingTime.value.toString().padLeft(2, '0')}"
+                      : "Did not receive code?",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: ColorConstants.primaryTextColor,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
               InkWell(
-                onTap: () {
-                },
+                onTap: () => controller.resendOTP(),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
@@ -172,7 +176,10 @@ class VerifyEmailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2 * SizeConstants.spaceBtwSections),
-              CustomElevatedButton(onPressed: ()=>Get.to(SignUpSuccessScreen()), child: Text("Validate OTP")),
+              CustomElevatedButton(
+                onPressed: () =>controller.verifyOTP(),
+                child: Text("Validate OTP"),
+              ),
             ],
           ),
         ),
@@ -180,5 +187,3 @@ class VerifyEmailScreen extends StatelessWidget {
     );
   }
 }
-
-

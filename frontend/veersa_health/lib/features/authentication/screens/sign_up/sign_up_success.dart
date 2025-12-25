@@ -17,10 +17,8 @@ class SignUpSuccessScreen extends StatelessWidget {
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
-              child: IntrinsicHeight( 
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
@@ -35,7 +33,7 @@ class SignUpSuccessScreen extends StatelessWidget {
                         width: 250,
                         fit: BoxFit.contain,
                       ),
-                      
+
                       const SizedBox(height: 30),
 
                       const Text(
@@ -47,7 +45,7 @@ class SignUpSuccessScreen extends StatelessWidget {
                           color: Colors.black87,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 15),
 
                       const Text(
@@ -66,7 +64,7 @@ class SignUpSuccessScreen extends StatelessWidget {
                         onPressed: () => Get.offAll(() => const LoginScreen()),
                         child: const Text("Let's Login"),
                       ),
-                      
+
                       const SizedBox(height: 20),
                     ],
                   ),
