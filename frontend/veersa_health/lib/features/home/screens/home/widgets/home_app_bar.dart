@@ -7,11 +7,13 @@ import 'package:veersa_health/utils/constants/color_constants.dart';
 class HomeAppBar extends StatelessWidget {
   final HomeController controller;
   final VoidCallback onNotificationTap;
+  final VoidCallback onProfileTap;
 
   const HomeAppBar({
     super.key,
     required this.controller,
     required this.onNotificationTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -92,6 +94,25 @@ class HomeAppBar extends StatelessWidget {
             onPressed: onNotificationTap,
             icon: const Icon(Iconsax.notification_bing,
                 color: Colors.black),
+          ),
+        ),
+        const SizedBox(width: 10,),
+        Container(
+          decoration: BoxDecoration(
+            color: ColorConstants.primaryBrandColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(10),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
+            onPressed: onProfileTap,
+            icon: const Icon(Iconsax.user,
+                color: ColorConstants.white),
           ),
         ),
       ],

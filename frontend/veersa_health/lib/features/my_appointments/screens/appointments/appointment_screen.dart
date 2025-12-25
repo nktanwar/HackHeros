@@ -13,7 +13,11 @@ class AppointmentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.arrow_back_ios_new, size: 20),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Get.back(),
+        ),
         title: const Text("My Appointments"),
       ),
       body: Column(

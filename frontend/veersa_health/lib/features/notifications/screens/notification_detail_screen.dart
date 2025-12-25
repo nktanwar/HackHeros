@@ -188,7 +188,7 @@ class NotificationDetailScreen extends StatelessWidget {
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(12),
                           image: const DecorationImage(
-                            image: NetworkImage('https://static.vecteezy.com/system/resources/previews/000/553/960/non_2x/vector-isometric-map-city-infographic-elements.jpg'),
+                            image: NetworkImage('assets/images/map/map_placeholder.png'),
                             fit: BoxFit.cover,
                           ),
                         ),

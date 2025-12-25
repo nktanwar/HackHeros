@@ -47,6 +47,7 @@ flutter:
     - assets/images/onboarding/
     - assets/images/signup/
     - assets/images/booking/
+    - assets/images/map/
     - assets/images/doctors_speciality/
     - assets/images/forget_password/
     - assets/logo/

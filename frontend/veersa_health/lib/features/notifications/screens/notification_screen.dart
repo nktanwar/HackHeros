@@ -17,7 +17,10 @@ class NotificationScreen extends StatelessWidget {
       backgroundColor: ColorConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: ColorConstants.backgroundColor,
-        automaticallyImplyActions: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Get.back(),
+        ),
         centerTitle: true,
         title: const Text(
           "Notifications",

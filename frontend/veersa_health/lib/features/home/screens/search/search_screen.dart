@@ -4,6 +4,8 @@ import 'package:veersa_health/features/home/controllers/search_logic_controller.
 import 'package:veersa_health/features/home/screens/home/widgets/doctors_card.dart';
 import 'package:veersa_health/features/home/screens/search/widgets/search_bottom_sheet.dart';
 import 'package:veersa_health/features/home/screens/search/widgets/search_field_with_filter.dart';
+import 'package:veersa_health/features/my_appointments/screens/schedule/doctor_detail_screen.dart';
+import 'package:veersa_health/features/my_appointments/screens/schedule/schedule_appointment_screen.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
@@ -127,7 +129,12 @@ class SearchScreen extends StatelessWidget {
           imageUrl: doc.image,
           distance: "${doc.distanceKm} km away",
           fees: "Fees: Rs ${doc.fees}",
-          onScheduleTap: () {},
+          onScheduleTap: () {
+                Get.to(() => const ScheduleAppointmentScreen());
+              },
+          onCardTap: () {
+                Get.to(() => const DoctorDetailScreen());
+              },
         );
       },
     );

@@ -15,10 +15,12 @@ class AppointmentDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE), // Light grey-blue background
       appBar: AppBar(
+        
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Get.back(),
         ),
+        
         title: const Text("Appointment Details"),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -244,7 +246,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                       width: double.infinity,
                       // Using a network image to simulate the map in your screenshot
                       child: Image.network(
-                        "https://i.imgur.com/K3yZ0G5.png", // Generic map placeholder
+                        "assets/images/map/map_placeholder.dart", 
                         fit: BoxFit.cover,
                         errorBuilder: (c,o,s) => Container(
                           color: Colors.grey.shade200, 
