@@ -1,10 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:veersa_health/common/widgets/header/section_heading_with_button.dart';
+import 'package:veersa_health/features/home/controllers/home_controller.dart';
+import 'package:veersa_health/features/home/screens/home/widgets/doctor_speciality_list.dart';
+import 'package:veersa_health/features/home/screens/home/widgets/home_app_bar.dart';
+import 'package:veersa_health/features/home/screens/home/widgets/home_credit_banner.dart';
+import 'package:veersa_health/features/home/screens/home/widgets/home_search_bar.dart';
+import 'package:veersa_health/features/home/screens/home/widgets/near_by_doctor_list.dart';
+import 'package:veersa_health/features/home/screens/home/widgets/upcoming_schedule_list.dart';
+import 'package:veersa_health/features/home/screens/search/search_screen.dart';
+import 'package:veersa_health/features/notifications/screens/notification_screen.dart';
+import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    // Initialize the controller
+    final controller = Get.put(HomeController());
+
+    return Scaffold(
+      backgroundColor: ColorConstants.backgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. Header Widget (Observer inside)
+                HomeAppBar(
+                  controller: controller,
+                  onNotificationTap: () => Get.to(() => const NotificationScreen()),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 2. Search Bar Widget
+                HomeSearchBar(
+                  onSearchTap: () => Get.to(() => const SearchScreen(showFilterBottom: false)),
+                  onFilterTap: () => Get.to(() => const SearchScreen(showFilterBottom: true)),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 3. Upcoming Schedule Section
+                const SectionHeadingWithButton(
+                  sectionHeading: "Upcoming Schedule",
+                  isButtonVisible: true,
+                  buttonText: "View All",
+                ),
+                const SizedBox(height: 16),
+                const UpcomingScheduleList(),
+
+                const SizedBox(height: 24),
+
+                // 4. Doctor Speciality Section
+                const SectionHeadingWithButton(
+                  sectionHeading: "Doctor Speciality",
+                  isButtonVisible: true,
+                  buttonText: "View All",
+                ),
+                const SizedBox(height: 16),
+                const DoctorSpecialityList(),
+
+                const SizedBox(height: 24),
+
+                // 5. Nearby Doctors Section
+                const SectionHeadingWithButton(
+                  sectionHeading: "Nearby Doctors",
+                  isButtonVisible: true,
+                  buttonText: "View All",
+                ),
+                const SizedBox(height: 16),
+                const NearbyDoctorsList(),
+
+                const SizedBox(height: 24),
+
+                // 6. Map Banner Widget
+                const HomeCreditBanner(),
+                
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

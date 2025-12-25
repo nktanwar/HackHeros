@@ -8,7 +8,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:veersa_health/bindings/general_bindings.dart';
 import 'package:veersa_health/features/authentication/controllers/onboarding/onboarding_controller.dart';
 import 'package:veersa_health/features/authentication/screens/login/login_screen.dart';
-import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/theme/theme.dart';
 
 Future<void> main() async {
