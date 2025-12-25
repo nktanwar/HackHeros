@@ -13,7 +13,10 @@ class NewPasswordController extends GetxController {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final AuthenticationRepository _authRepo = Get.find();
-  
+
+  final hidePassword = true.obs;
+  final hideConfirmPassword = true.obs;
+
   late String email;
 
   @override
@@ -27,20 +30,23 @@ class NewPasswordController extends GetxController {
       if (!formKey.currentState!.validate()) return;
 
       if (passwordController.text != confirmPasswordController.text) {
-        CustomLoaders.warningSnackBar(title: "Mismatch", message: "Passwords do not match");
+        CustomLoaders.warningSnackBar(
+          title: "Mismatch",
+          message: "Passwords do not match",
+        );
         return;
       }
 
-      CustomFullScreenLoader.openLoadingDialog("Updating Password...", ImageStringsConstants.loadingImage);
+      CustomFullScreenLoader.openLoadingDialog(
+        "Updating Password...",
+        ImageStringsConstants.loadingImage,
+      );
 
-      // Call API
       await _authRepo.resetPassword(email, passwordController.text.trim());
 
       CustomFullScreenLoader.closeLoadingDialog();
 
-      // Success -> Navigate to Success Screen
       Get.offAll(() => const PasswordSuccessScreen());
-
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
       CustomLoaders.errorSnackBar(title: "Error", message: e.toString());
