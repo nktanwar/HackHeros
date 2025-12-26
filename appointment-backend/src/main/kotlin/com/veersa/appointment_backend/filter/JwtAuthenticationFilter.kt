@@ -29,6 +29,8 @@ class JwtAuthenticationFilter(
         ) {
             val token = authHeader.substring(7)
 
+
+
             if (jwtUtils.validateToken(token)) {
 
                 val userPrincipal = jwtUtils.extractUser(token)

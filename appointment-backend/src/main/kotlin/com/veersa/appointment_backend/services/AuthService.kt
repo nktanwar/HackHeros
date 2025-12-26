@@ -7,6 +7,7 @@ import com.veersa.appointment_backend.dto.SignupRequest
 
 import com.veersa.appointment_backend.models.User
 import com.veersa.appointment_backend.models.UserRole
+import com.veersa.appointment_backend.repoistory.EmailOtpRepository
 import com.veersa.appointment_backend.repoistory.UserRepository
 import com.veersa.appointment_backend.utils.JwtUtils
 import com.veersa.appointment_backend.utils.UserPrincipal
@@ -19,6 +20,8 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtUtils: JwtUtils,
     private val jwtProperties: JwtProperties,
+    private val emailOtpRepository: EmailOtpRepository,
+
 ) {
 
     fun signup(request: SignupRequest) {
@@ -34,9 +37,6 @@ class AuthService(
             throw IllegalArgumentException("Admin registration is not allowed")
         }
 
-        if (request.role == UserRole.DOCTOR) {
-            requireNotNull(request.specialty) { "Specialty is required for doctors" }
-        }
 
         val user = User(
             name = request.name,
@@ -72,7 +72,8 @@ class AuthService(
             email = user.email,
             phoneNumber = user.phoneNumber,
             role = user.role.name,
-            verified = user.verified
+            verified = user.verified,
+            tokenVersion = user.tokenVersion
         )
 
         val token = jwtUtils.generateToken(principal)
@@ -82,4 +83,28 @@ class AuthService(
             expiresIn = jwtProperties.expirationMs
         )
     }
+
+
+    fun resetPassword(email: String, newPassword: String) {
+
+        val otpEntry = emailOtpRepository
+            .findTopByEmailAndUsedTrueOrderByExpiresAtDesc(email)
+            ?: throw IllegalStateException("OTP verification required")
+
+        val user = userRepository.findByEmail(email)
+            ?: throw IllegalArgumentException("User not found")
+
+        val updatedUser = user.copy(
+            password = passwordEncoder.encode(newPassword),
+            tokenVersion = user.tokenVersion + 1 //  invalidate JWTs
+        )
+
+        userRepository.save(updatedUser)
+
+        // cleanup
+        emailOtpRepository.deleteAllByEmail(email)
+    }
 }
+
+
+

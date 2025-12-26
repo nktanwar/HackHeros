@@ -21,7 +21,10 @@ class PushNotificationService(
 
     fun send(notification: Notification) {
 
+        println("📨 Push send started for notification ${notification.id}")
+
         val tokens = deviceTokenRepository.findByUserId(notification.userId)
+        println("📱 Device tokens found = ${tokens.size}")
         if (tokens.isEmpty()) {
             log.warn("No device tokens found for user {}", notification.userId)
             return
@@ -58,6 +61,8 @@ class PushNotificationService(
                     .putData("appointmentId", notification.appointmentId)
                     .putData("mapUrl", mapUrl)
                     .build()
+
+                log.info("📍 Map deep link = {}", mapUrl)
 
                 FirebaseMessaging.getInstance().send(message)
                 log.info(

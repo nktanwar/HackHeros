@@ -24,11 +24,15 @@ class DoctorSearchRepositoryImpl(
         maxDistanceKm: Double
     ): List<DoctorSearchResult> {
 
-        // 1️⃣ Build NearQuery (THIS is what geoNear expects)
+        val earthRadiusKm = 6371.0
+
         val nearQuery = NearQuery.near(
             GeoJsonPoint(longitude, latitude)
         )
-            .maxDistance(maxDistanceKm * 1000) // meters
+            // maxDistance must be in RADIANS
+            .maxDistance(maxDistanceKm / earthRadiusKm)
+            // 🔥 THIS is where distance is converted
+            .distanceMultiplier(earthRadiusKm)
             .query(
                 Query(
                     Criteria.where("specialty").`is`(specialty)
@@ -38,31 +42,26 @@ class DoctorSearchRepositoryImpl(
             )
             .spherical(true)
 
-        // 2️⃣ geoNear aggregation stage
         val geoNearStage = Aggregation.geoNear(
             nearQuery,
-            "distanceInMeters"
+            "distanceInKm"   // already in KM
         )
 
-        // 3️⃣ Projection
         val projectStage = project()
             .and("doctorId").`as`("doctorId")
             .and("clinicName").`as`("clinicName")
             .and("specialty").`as`("specialty")
-            .and("distanceInMeters").divide(1000).`as`("distanceInKm")
+            .and("distanceInKm").`as`("distanceInKm")
 
         val aggregation = Aggregation.newAggregation(
             geoNearStage,
             projectStage
         )
 
-        val results: AggregationResults<DoctorSearchResult> =
-            mongoTemplate.aggregate(
-                aggregation,
-                "doctor_profiles",
-                DoctorSearchResult::class.java
-            )
-
-        return results.mappedResults
+        return mongoTemplate.aggregate(
+            aggregation,
+            "doctor_profiles",
+            DoctorSearchResult::class.java
+        ).mappedResults
     }
 }

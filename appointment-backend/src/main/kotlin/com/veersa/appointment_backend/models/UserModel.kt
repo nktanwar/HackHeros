@@ -23,6 +23,7 @@ data class User(
 
     val role: UserRole,
 
+    val tokenVersion: Long = 0,
 
     val verified: Boolean = false
 )

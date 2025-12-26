@@ -26,4 +26,18 @@ interface AppointmentRepository : MongoRepository<Appointment, String> {
 
     fun findByPatientId(patientId: String): List<Appointment>
 
+    fun existsByDoctorIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+        doctorId: String,
+        status: AppointmentStatus,
+        endTime: Instant,
+        startTime: Instant
+    ): Boolean
+
+    fun existsByPatientIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+        patientId: String,
+        status: AppointmentStatus,
+        endTime: Instant,
+        startTime: Instant
+    ): Boolean
+
 }

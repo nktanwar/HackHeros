@@ -1,9 +1,8 @@
 package com.veersa.appointment_backend.controllers
 
-
-import com.veersa.appointment_backend.models.DoctorAvailability
-import com.veersa.appointment_backend.repoistory.DoctorAvailabilityRepository
-import com.veersa.appointment_backend.services.DoctorAvailabilityStatusService
+import com.veersa.appointment_backend.services.DoctorService
+import com.veersa.appointment_backend.dto.DoctorAvailabilityRequest
+import com.veersa.appointment_backend.dto.DoctorAvailabilityResponse
 import com.veersa.appointment_backend.utils.UserPrincipal
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -12,25 +11,35 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/doctor/availability")
+@RequestMapping("/api/doctors/availability")
+@PreAuthorize("hasRole('DOCTOR')")
 class DoctorAvailabilityController(
-    private val repository: DoctorAvailabilityRepository,
-    private val statusService: DoctorAvailabilityStatusService
+    private val service: DoctorService
 ) {
 
-    @PreAuthorize("hasRole('DOCTOR')")
     @PostMapping
-    fun createAvailability(
+    fun addAvailability(
         @AuthenticationPrincipal doctor: UserPrincipal,
-        @Valid @RequestBody availability: DoctorAvailability
-    ): ResponseEntity<DoctorAvailability> {
+        @Valid @RequestBody request: DoctorAvailabilityRequest
+    ): ResponseEntity<String> {
 
-        val saved = repository.save(
-            availability.copy(doctorId = doctor.userId)
-        )
+        service.addAvailability(doctor.userId, request)
+        return ResponseEntity.ok("Availability added successfully")
+    }
 
-        statusService.recomputeBookableStatus(doctor.userId)
+    @GetMapping("/my")
+    fun myAvailability(
+        @AuthenticationPrincipal doctor: UserPrincipal
+    ): List<DoctorAvailabilityResponse> =
+        service.getMyAvailability(doctor.userId)
 
-        return ResponseEntity.ok(saved)
+    @PostMapping("/{availabilityId}/deactivate")
+    fun deactivateAvailability(
+        @AuthenticationPrincipal doctor: UserPrincipal,
+        @PathVariable availabilityId: String
+    ): ResponseEntity<String> {
+
+        service.deactivateAvailability(availabilityId, doctor.userId)
+        return ResponseEntity.ok("Availability deactivated")
     }
 }

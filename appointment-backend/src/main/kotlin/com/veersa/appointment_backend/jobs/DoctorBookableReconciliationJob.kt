@@ -1,14 +1,14 @@
 package com.veersa.appointment_backend.jobs
 
 import com.veersa.appointment_backend.repoistory.DoctorProfileRepository
-import com.veersa.appointment_backend.services.DoctorAvailabilityStatusService
+import com.veersa.appointment_backend.services.DoctorService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
 class DoctorBookableReconciliationJob(
     private val doctorProfileRepository: DoctorProfileRepository,
-    private val statusService: DoctorAvailabilityStatusService
+    private val statusService: DoctorService
 ) {
 
     /**

@@ -83,4 +83,26 @@ class EmailOtpService(
 
 
     }
+
+
+    fun verifyOtpForPasswordReset(email: String, otp: String) {
+
+        val otpEntry = emailOtpRepository
+            .findTopByEmailAndUsedFalseOrderByExpiresAtDesc(email)
+            ?: throw IllegalArgumentException("OTP not found")
+
+        val expiryTime = otpEntry.expiresAt.plusSeconds(OTP_EXPIRY_SECONDS)
+        if (expiryTime.isBefore(Instant.now())) {
+            throw IllegalArgumentException("OTP expired")
+        }
+
+        if (!passwordEncoder.matches(otp, otpEntry.otpHash)) {
+            throw IllegalArgumentException("Invalid OTP")
+        }
+
+        emailOtpRepository.save(
+            otpEntry.copy(used = true)
+        )
+    }
+
 }

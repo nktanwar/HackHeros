@@ -8,4 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface EmailOtpRepository : MongoRepository<EmailOtp, String> {
     fun deleteAllByEmail(email: String)
     fun findTopByEmailAndUsedFalseOrderByExpiresAtDesc(email: String): EmailOtp?
+
+    fun findTopByEmailAndUsedTrueOrderByExpiresAtDesc(email: String): EmailOtp?
 }
