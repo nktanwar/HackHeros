@@ -35,8 +35,8 @@ class SignupRequest {
   final String email;
   final String phoneNumber;
   final String password;
-  final String role; // "PATIENT" or "DOCTOR"
-  final String? specialty; // Nullable
+  final String role; 
+  final String? specialty; 
   final double latitude;
   final double longitude;
 

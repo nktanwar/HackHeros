@@ -8,7 +8,7 @@ import 'package:veersa_health/data/service/api_service.dart';
 import 'package:veersa_health/features/authentication/models/auth_model.dart';
 import 'package:veersa_health/features/authentication/screens/login/login_screen.dart';
 import 'package:veersa_health/features/authentication/screens/onboarding/onboarding_screen.dart';
-import 'package:veersa_health/features/home/screens/home/home_screen.dart'; // Assume this exists
+import 'package:veersa_health/features/home/screens/home/home_screen.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -22,10 +22,9 @@ class AuthenticationRepository extends GetxController {
     screenRedirect();
   }
 
-  // 1. Check Auth Status on App Start
   void screenRedirect() async {
     final token = deviceStorage.read('ACCESS_TOKEN');
-    
+
     if (token != null) {
       Get.offAll(() => const HomeScreen());
     } else {
@@ -39,17 +38,17 @@ class AuthenticationRepository extends GetxController {
   Future<void> login(String email, String password) async {
     try {
       final requestModel = LoginRequest(email: email, password: password);
-      
+
       final response = await _apiService.post(
-        '/api/auth/login', 
-        data: requestModel.toJson()
+        '/api/auth/login',
+        data: requestModel.toJson(),
       );
 
       if (response.statusCode == 200) {
         final authResponse = LoginResponse.fromJson(response.data);
-        
+
         await deviceStorage.write('ACCESS_TOKEN', authResponse.accessToken);
-        
+
         await registerFCMToken();
 
         Get.offAll(() => const HomeScreen());
@@ -57,7 +56,7 @@ class AuthenticationRepository extends GetxController {
         throw "Login failed: ${response.statusMessage}";
       }
     } catch (e) {
-      throw e.toString(); 
+      throw e.toString();
     }
   }
 
@@ -69,14 +68,18 @@ class AuthenticationRepository extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return; 
+        debugPrint("=======responseCode:${response.statusCode} ");
+        return;
       } else {
+        debugPrint("=======responseCode:${response.statusCode} ");
         throw "Registration failed: ${response.data['message'] ?? 'Unknown error'}";
       }
     } catch (e) {
+      debugPrint("Error:::::: ${e.toString()} ");
       throw e.toString();
     }
   }
+
   Future<void> sendEmailOtp(String email) async {
     try {
       final response = await _apiService.post(
@@ -94,15 +97,11 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-  // NEW: Verify OTP
   Future<void> verifyEmailOtp(String email, String otp) async {
     try {
       final response = await _apiService.post(
         '/api/auth/verify-email-otp',
-        data: {
-          'email': email,
-          'otp': otp,
-        },
+        data: {'email': email, 'otp': otp},
       );
 
       if (response.statusCode == 200) {
@@ -114,6 +113,7 @@ class AuthenticationRepository extends GetxController {
       throw e.toString();
     }
   }
+
   Future<void> registerFCMToken() async {
     try {
       FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -125,33 +125,31 @@ class AuthenticationRepository extends GetxController {
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         debugPrint('User granted permission');
-        
-        // 2. Get Token
+
         String? token = await messaging.getToken();
-        
+
         if (token != null) {
-          // 3. Send to Backend
           await _apiService.post(
-            '/api/devices/register', 
+            '/api/devices/register',
             data: {"token": token},
           );
           debugPrint("FCM Token Registered: $token");
-          
-          // 4. Listen for Foreground Messages
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-          _handleForegroundNotification(message);
-        });
 
-        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-          _handleNotificationTap(message.data);
-        });
+          FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+            _handleForegroundNotification(message);
+          });
 
-        // 5. Handle Terminated State Tap
-        FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-          if (message != null) {
+          FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
             _handleNotificationTap(message.data);
-          }
-        });
+          });
+
+          FirebaseMessaging.instance.getInitialMessage().then((
+            RemoteMessage? message,
+          ) {
+            if (message != null) {
+              _handleNotificationTap(message.data);
+            }
+          });
         }
       } else {
         debugPrint('User declined or has not accepted permission');
@@ -162,7 +160,6 @@ class AuthenticationRepository extends GetxController {
   }
 
   void _handleForegroundNotification(RemoteMessage message) {
-    // Determine title/body from data payload if notification block is empty (Data-only payload)
     String title = message.notification?.title ?? "New Notification";
     String body = message.notification?.body ?? "";
 
@@ -181,10 +178,11 @@ class AuthenticationRepository extends GetxController {
       backgroundColor: Colors.white,
       colorText: Colors.black,
       icon: const Icon(Icons.notifications_active, color: Colors.blue),
-      onTap: (_) => _handleNotificationTap(message.data), // Handle tap on snackbar
+      onTap: (_) => _handleNotificationTap(message.data),
       duration: const Duration(seconds: 5),
     );
   }
+
   Future<void> _handleNotificationTap(Map<String, dynamic> data) async {
     if (data['mapUrl'] != null) {
       final Uri url = Uri.parse(data['mapUrl']);
@@ -195,18 +193,19 @@ class AuthenticationRepository extends GetxController {
       }
     }
   }
-  // 5. Logout
+
   Future<void> logout() async {
     await deviceStorage.remove('ACCESS_TOKEN');
     Get.offAll(() => const LoginScreen());
   }
+
   Future<void> forgotPassword(String email) async {
     try {
       final response = await _apiService.post(
-        '/api/users/forgot-password',
+        '/api/auth/forgot-password',
         data: {'email': email},
       );
-      
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return;
       } else {
@@ -217,15 +216,11 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-  // 2. Verify Reset OTP
   Future<void> verifyResetOtp(String email, String otp) async {
     try {
       final response = await _apiService.post(
-        '/api/users/verify-reset-otp',
-        data: {
-          'email': email,
-          'otp': otp,
-        },
+        '/api/auth/verify-reset-otp',
+        data: {'email': email, 'otp': otp},
       );
 
       if (response.statusCode == 200) {
@@ -238,15 +233,11 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-  // 3. Reset Password
   Future<void> resetPassword(String email, String newPassword) async {
     try {
       final response = await _apiService.post(
-        '/api/users/reset-password',
-        data: {
-          'email': email,
-          'newPassword': newPassword,
-        },
+        '/api/auth/reset-password',
+        data: {'email': email, 'newPassword': newPassword},
       );
 
       if (response.statusCode == 200) {

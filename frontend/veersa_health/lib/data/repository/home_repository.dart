@@ -7,7 +7,6 @@ import 'package:veersa_health/features/my_appointments/models/appointment_model.
 class HomeRepository {
   final ApiService _apiService = ApiService();
 
-  // 1. Get Current Position
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -22,22 +21,23 @@ class HomeRepository {
         return Future.error('Location permissions are denied');
       }
     }
-    
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
 
-  // 2. Convert to Address (Reverse Geocoding)
   Future<String> getAddressFromLatLng(Position position) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude, 
-        position.longitude
+        position.latitude,
+        position.longitude,
       );
-      
+
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        // Format: Street, SubLocality, Locality
-        return "${place.street}, ${place.subLocality}, ${place.locality}"; 
+
+        return "${place.street}, ${place.subLocality}, ${place.locality}";
       }
       return "Unknown Location";
     } catch (e) {
@@ -45,18 +45,21 @@ class HomeRepository {
     }
   }
 
-  // 3. Fetch Nearby Doctors (Using Real API)
-  Future<List<DoctorModel>> getNearbyDoctors(double lat, double lng, {String? specialty}) async {
+  Future<List<DoctorModel>> getNearbyDoctors(
+    double lat,
+    double lng, {
+    String? specialty,
+  }) async {
     try {
       final response = await _apiService.get(
         '/api/doctors/search',
         params: {
           'latitude': lat,
           'longitude': lng,
-          if(specialty != null) 'specialty': specialty
+          if (specialty != null) 'specialty': specialty,
         },
       );
-      
+
       List<dynamic> data = response.data;
       return data.map((json) => DoctorModel.fromJson(json)).toList();
     } catch (e) {
@@ -64,7 +67,6 @@ class HomeRepository {
     }
   }
 
-  // 4. Fetch Appointments (Using Real API)
   Future<List<AppointmentModel>> getMyAppointments() async {
     try {
       final response = await _apiService.get('/api/appointments/my');

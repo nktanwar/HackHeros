@@ -15,8 +15,8 @@ class SignUpHeader extends StatelessWidget {
         
         Image(
           image: AssetImage(ImageStringsConstants.appIcon), 
-          height: 150, 
-          width: 150,
+          height: 100, 
+          width: 100,
         ),
         const SizedBox(height: SizeConstants.spaceBtwSections),
         

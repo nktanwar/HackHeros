@@ -5,25 +5,22 @@ import 'package:veersa_health/features/my_appointments/models/slot_model.dart';
 import 'package:veersa_health/features/my_appointments/screens/schedule/booking_success_screen.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
-import 'package:veersa_health/utils/popups/full_screen_loader.dart';
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
 
 class AppointmentController extends GetxController {
   static AppointmentController get instance => Get.find();
   final _repo = Get.put(AppointmentRepository());
 
-  // --- MY APPOINTMENTS STATE ---
   var isLoading = true.obs;
-  var selectedTab = 0.obs; // 0 = Upcoming, 1 = Previous
+  var selectedTab = 0.obs;
   var upcomingAppointments = <AppointmentModel>[].obs;
   var previousAppointments = <AppointmentModel>[].obs;
 
-  // --- BOOKING STATE ---
   var isSlotsLoading = false.obs;
   var selectedDate = DateTime.now().obs;
-  var bookingDoctorId = ''.obs; // To know which doctor we are booking
-  
-  // We store the full SlotModel because we need both startTime and endTime for the API
-  var selectedSlot = Rxn<SlotModel>(); 
+  var bookingDoctorId = ''.obs;
+
+  var selectedSlot = Rxn<SlotModel>();
   var availableSlots = <SlotModel>[].obs;
 
   @override
@@ -36,29 +33,26 @@ class AppointmentController extends GetxController {
     selectedTab.value = index;
   }
 
-  // 1. Fetch & Sort Appointments
   void fetchAppointments() async {
     try {
       isLoading.value = true;
       final allAppointments = await _repo.getMyAppointments();
-      
+
       final now = DateTime.now();
 
-      // Logic: Filter based on start time vs Now
       upcomingAppointments.value = allAppointments.where((appt) {
-        return appt.startTime.isAfter(now) && appt.status != AppointmentStatus.CANCELLED;
+        return appt.startTime.isAfter(now) &&
+            appt.status != AppointmentStatus.CANCELLED;
       }).toList();
-      
-      // Sort upcoming: Nearest first
+
       upcomingAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
 
       previousAppointments.value = allAppointments.where((appt) {
-        return appt.startTime.isBefore(now) || appt.status == AppointmentStatus.COMPLETED;
+        return appt.startTime.isBefore(now) ||
+            appt.status == AppointmentStatus.COMPLETED;
       }).toList();
-      
-      // Sort previous: Newest first
-      previousAppointments.sort((a, b) => b.startTime.compareTo(a.startTime));
 
+      previousAppointments.sort((a, b) => b.startTime.compareTo(a.startTime));
     } catch (e) {
       CustomLoaders.errorSnackBar(title: 'Error', message: e.toString());
     } finally {
@@ -66,9 +60,6 @@ class AppointmentController extends GetxController {
     }
   }
 
-  // --- BOOKING LOGIC ---
-
-  // Called when entering the Schedule Screen
   void initBooking(String doctorId) {
     bookingDoctorId.value = doctorId;
     selectedDate.value = DateTime.now();
@@ -78,7 +69,7 @@ class AppointmentController extends GetxController {
 
   void onDateSelected(DateTime date) {
     selectedDate.value = date;
-    selectedSlot.value = null; // Clear previous selection
+    selectedSlot.value = null;
     fetchSlotsForDate(date);
   }
 
@@ -86,17 +77,15 @@ class AppointmentController extends GetxController {
     selectedSlot.value = slot;
   }
 
-  // 2. Fetch Slots from Backend
   void fetchSlotsForDate(DateTime date) async {
     if (bookingDoctorId.value.isEmpty) return;
 
     try {
       isSlotsLoading.value = true;
       availableSlots.clear();
-      
+
       final slots = await _repo.getDoctorSlots(bookingDoctorId.value, date);
       availableSlots.assignAll(slots);
-      
     } catch (e) {
       CustomLoaders.errorSnackBar(title: "Slots Error", message: e.toString());
     } finally {
@@ -104,12 +93,11 @@ class AppointmentController extends GetxController {
     }
   }
 
-  // 3. Confirm Booking
   void confirmAppointment() async {
     if (selectedSlot.value == null) {
       CustomLoaders.warningSnackBar(
-        title: "Select Time", 
-        message: "Please select a time slot to proceed."
+        title: "Select Time",
+        message: "Please select a time slot to proceed.",
       );
       return;
     }
@@ -117,25 +105,26 @@ class AppointmentController extends GetxController {
     try {
       CustomFullScreenLoader.openLoadingDialog(
         "Booking appointment...",
-        ImageStringsConstants.loadingImage, 
+        ImageStringsConstants.loadingImage,
       );
 
       await _repo.bookAppointment(
-        bookingDoctorId.value, 
-        selectedSlot.value!.startTime, 
-        selectedSlot.value!.endTime
+        bookingDoctorId.value,
+        selectedSlot.value!.startTime,
+        selectedSlot.value!.endTime,
       );
 
       CustomFullScreenLoader.closeLoadingDialog();
-      
-      // Refresh list for when we return to home
-      fetchAppointments();
-      
-      Get.off(() => const BookingSuccessScreen());
 
+      fetchAppointments();
+
+      Get.off(() => const BookingSuccessScreen());
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
-      CustomLoaders.errorSnackBar(title: "Booking Failed", message: e.toString());
+      CustomLoaders.errorSnackBar(
+        title: "Booking Failed",
+        message: e.toString(),
+      );
     }
   }
 }

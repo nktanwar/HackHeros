@@ -1,4 +1,8 @@
-enum NotificationType { APPOINTMENT_CONFIRMATION, APPOINTMENT_REMINDER, GENERAL }
+enum NotificationType {
+  APPOINTMENT_CONFIRMATION,
+  APPOINTMENT_REMINDER,
+  GENERAL,
+}
 
 class NotificationModel {
   final String id;
@@ -7,8 +11,8 @@ class NotificationModel {
   final NotificationType type;
   final DateTime scheduledAt;
   final bool sent;
+  final String? mapUrl;
 
-  // Constructor
   NotificationModel({
     required this.id,
     required this.appointmentId,
@@ -16,6 +20,7 @@ class NotificationModel {
     required this.type,
     required this.scheduledAt,
     required this.sent,
+    this.mapUrl,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +31,7 @@ class NotificationModel {
       type: _parseType(json['type']),
       scheduledAt: DateTime.parse(json['scheduledAt']),
       sent: json['sent'] ?? false,
+      mapUrl: json['mapUrl'],
     );
   }
 

@@ -16,7 +16,7 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(LoginController());
     return Form(
-      // key: controller.formKey,
+      key: controller.formKey,
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: SizeConstants.defaultSpace,
@@ -51,6 +51,7 @@ class LoginForm extends StatelessWidget {
                 validator: Validators.validatePassword,
               ),
             ),
+            
             //Remember Me and Forget Passoword button
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -91,6 +92,7 @@ class LoginForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: SizeConstants.spaceBtwSections,),
+            
             //Sign In button
             CustomElevatedButton(
               onPressed: ()=>controller.signIn(),

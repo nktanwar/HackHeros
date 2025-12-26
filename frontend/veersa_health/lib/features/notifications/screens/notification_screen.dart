@@ -65,6 +65,9 @@ class NotificationScreen extends StatelessWidget {
                 description: controller.getDescription(notification),
                 dateTime: controller.formatTime(notification.scheduledAt),
                 isReminder: notification.type == NotificationType.APPOINTMENT_REMINDER,
+                onMapTap: (notification.mapUrl != null && notification.mapUrl!.isNotEmpty)
+                    ? () => controller.launchMap(notification.mapUrl)
+                    : null,
               );
             },
           ),

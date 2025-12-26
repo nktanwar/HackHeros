@@ -13,7 +13,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize Controller
     final controller = Get.put(ProfileController());
 
     return Scaffold(
@@ -22,24 +21,26 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        automaticallyImplyLeading: false, // Hide back button on main tab
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Get.back(),
+        ),
         title: Text(
           "Profile",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: controller.fetchUserProfile, // Add Pull-to-refresh
+        onRefresh: controller.fetchUserProfile,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(SizeConstants.defaultSpace),
             child: Column(
               children: [
-                // --- 1. Profile Header (Reactive) ---
                 SizedBox(
                   width: double.infinity,
                   child: Obx(() {
@@ -48,7 +49,6 @@ class ProfileScreen extends StatelessWidget {
                     }
                     return Column(
                       children: [
-                        // Avatar
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
@@ -60,39 +60,33 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage: AssetImage(controller.profileImage.value),
+                            backgroundImage: AssetImage(
+                              controller.profileImage.value,
+                            ),
                             backgroundColor: Colors.grey.shade200,
                           ),
                         ),
                         const SizedBox(height: 16),
 
-                        // Name from API
                         Text(
                           controller.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
+                          style: Theme.of(context).textTheme.headlineSmall
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
 
-                        // Email from API
                         Text(
                           controller.email,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: Colors.grey),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                         ),
                         const SizedBox(height: 4),
 
-                        // Phone from API
                         if (controller.phone.isNotEmpty)
                           Text(
                             controller.phone,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: Colors.black87,
                                   fontWeight: FontWeight.w600,
@@ -107,7 +101,6 @@ class ProfileScreen extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // --- 2. Menu Options ---
                 ProfileMenuTile(
                   icon: Iconsax.notification,
                   title: 'Notifications',
@@ -124,7 +117,6 @@ class ProfileScreen extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: 20),
 
-                // --- 3. Logout Button ---
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
@@ -133,14 +125,16 @@ class ProfileScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: Colors.red),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text(
                       "Logout",
                       style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600),
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),

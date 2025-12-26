@@ -4,7 +4,7 @@ import 'package:veersa_health/data/repository/authentication_repository.dart';
 import 'package:veersa_health/features/authentication/screens/sign_up/sign_up_success.dart';
 import 'package:veersa_health/utils/helpers/network_manager.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
-import 'package:veersa_health/utils/popups/full_screen_loader.dart';
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
 class VerifyEmailController extends GetxController {
@@ -14,16 +14,14 @@ class VerifyEmailController extends GetxController {
   Timer? _timer;
 
   var otpDigits = List.filled(6, '').obs;
-  // 1. Get Repo Instance
+
   final AuthenticationRepository _authRepo = Get.find();
 
-  // 2. Variable to hold the email passed from Sign Up
   late String email;
 
   @override
   void onInit() {
     super.onInit();
-    // 3. Retrieve Email from Arguments
     email = Get.arguments ?? "";
     if (email.isEmpty) {
       CustomLoaders.errorSnackBar(
@@ -50,7 +48,6 @@ class VerifyEmailController extends GetxController {
     otpDigits[index] = value;
   }
 
-  // 5. Implement Verify OTP
   Future<void> verifyOTP() async {
     String otp = otpDigits.join();
     try {
@@ -77,7 +74,6 @@ class VerifyEmailController extends GetxController {
 
       CustomFullScreenLoader.closeLoadingDialog();
 
-      // Navigate to Success
       Get.off(() => const SignUpSuccessScreen());
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
@@ -88,7 +84,6 @@ class VerifyEmailController extends GetxController {
     }
   }
 
-  // 4. Implement Resend OTP
   Future<void> resendOTP() async {
     if (remainingTime.value == 0) {
       try {
@@ -110,7 +105,10 @@ class VerifyEmailController extends GetxController {
         startTimer();
       } catch (e) {
         CustomFullScreenLoader.closeLoadingDialog();
-        CustomLoaders.errorSnackBar(title: "Oh Snap!", message: e.toString());
+        CustomLoaders.errorSnackBar(
+          title: "Something went wrong!",
+          message: "Error in re-sending otp. Try after some time.",
+        );
       }
     } else {
       CustomLoaders.customToast(message: "Please wait before resending.");

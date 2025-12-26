@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:veersa_health/data/repository/authentication_repository.dart';
+import 'package:veersa_health/features/home/screens/home/home_screen.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 import 'package:veersa_health/utils/helpers/network_manager.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
-import 'package:veersa_health/utils/popups/full_screen_loader.dart';
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find();
@@ -22,7 +23,6 @@ class LoginController extends GetxController {
   }
 
   final AuthenticationRepository _authRepo = AuthenticationRepository.instance;
-  // final UserRepository _userRepo = UserRepository.instance;
 
   @override
   void onInit() {
@@ -37,14 +37,12 @@ class LoginController extends GetxController {
 
   Future<void> signIn() async {
     try {
-      // 1. Validation
       if (!formKey.currentState!.validate()) return;
       final isConnected = await NetworkManager.instance.isConnected();
       if (!isConnected) {
         CustomLoaders.customToast(message: 'No internet connection.');
         return;
       }
-      // 2. Start Loading
 
       CustomFullScreenLoader.openLoadingDialog(
         "Logging you in...",
@@ -70,11 +68,13 @@ class LoginController extends GetxController {
       );
 
       CustomFullScreenLoader.closeLoadingDialog();
+      Get.offAll(() => const HomeScreen());
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
+      debugPrint("Error ===================================== $e");
       CustomLoaders.errorSnackBar(
         title: "Login Failded",
-        message: e.toString(),
+        message: "Invalid Credentials!",
       );
     }
   }

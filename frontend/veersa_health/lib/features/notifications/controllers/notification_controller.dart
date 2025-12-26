@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:veersa_health/data/repository/notification_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:veersa_health/features/notifications/models/notificaton_model.dart';
@@ -9,9 +10,6 @@ class NotificationController extends GetxController {
   var notifications = <NotificationModel>[].obs;
   var isLoading = true.obs;
 
-  // Since backend doesn't return 'isRead', we treat all fetched as read/history
-  // or simple list. Separation logic removed as it was based on dummy data.
-  
   @override
   void onInit() {
     super.onInit();
@@ -22,18 +20,27 @@ class NotificationController extends GetxController {
     try {
       isLoading.value = true;
       final list = await _repo.getMyNotifications();
-      // Sort by newest first
+
       list.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
       notifications.assignAll(list);
     } catch (e) {
-      // Handle error
+      print("Error: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  // --- Helpers for UI (Deriving data from Type) ---
-  
+  Future<void> launchMap(String? url) async {
+    if (url != null && url.isNotEmpty) {
+      final Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        Get.snackbar("Error", "Could not open map.");
+      }
+    }
+  }
+
   String getTitle(NotificationModel model) {
     switch (model.type) {
       case NotificationType.APPOINTMENT_CONFIRMATION:
@@ -46,12 +53,11 @@ class NotificationController extends GetxController {
   }
 
   String getDescription(NotificationModel model) {
-    // Since backend doesn't give description, we generate generic text
     switch (model.type) {
       case NotificationType.APPOINTMENT_CONFIRMATION:
         return "Your appointment has been successfully booked. Ref ID: ${model.appointmentId}";
       case NotificationType.APPOINTMENT_REMINDER:
-        return "This is a reminder for your appointment scheduled soon.";
+        return "This is a reminder for your appointment scheduled soon. Tap below for directions.";
       default:
         return "You have a new update regarding your account.";
     }

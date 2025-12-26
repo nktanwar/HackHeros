@@ -6,7 +6,7 @@ import 'package:veersa_health/features/authentication/models/auth_model.dart';
 import 'package:veersa_health/features/authentication/screens/sign_up/verify_email_screen.dart';
 import 'package:veersa_health/utils/helpers/network_manager.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart'; 
-import 'package:veersa_health/utils/popups/full_screen_loader.dart'; 
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart'; 
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
 class SignUpController extends GetxController {
@@ -87,15 +87,19 @@ class SignUpController extends GetxController {
       );
 
       await _authRepo.register(newUser);
-      
+      await _authRepo.sendEmailOtp(newUser.email);
       CustomFullScreenLoader.closeLoadingDialog();
+      CustomLoaders.successSnackBar(
+          title: "Success", 
+          message: "OTP sent to ${newUser.email} for verification of email."
+      );
       Get.to(
         () => const VerifyEmailScreen(), 
         arguments: emailController.text.trim() 
       );
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
-      CustomLoaders.errorSnackBar(title: "Oh Snap!", message: e.toString());
+      CustomLoaders.errorSnackBar(title: "Something went wrong!", message: "Account not created, email already available.");
     }
   }
 

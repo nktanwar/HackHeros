@@ -1,4 +1,4 @@
-package com.example.veersa_health
+package com.company.veersaHealth
 
 import io.flutter.embedding.android.FlutterActivity
 

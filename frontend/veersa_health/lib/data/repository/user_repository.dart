@@ -9,9 +9,8 @@ class UserRepository extends GetxService {
   /// Fetch User Details from backend
   Future<UserModel> getUserDetails() async {
     try {
-      // Endpoint matches your screenshot: GET /api/users/me
       final response = await _apiService.get('/api/users/me');
-      
+
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data);
       } else {

@@ -9,9 +9,8 @@ class AppointmentModel {
   final DateTime startTime;
   final DateTime endTime;
   final AppointmentStatus status;
-  
-  // UI Helpers (If backend doesn't send these, we default them or fetch separately)
-  final String doctorName; 
+
+  final String doctorName;
   final String clinicName;
   final String address;
   final String doctorImage;
@@ -24,7 +23,7 @@ class AppointmentModel {
     required this.startTime,
     required this.endTime,
     required this.status,
-    this.doctorName = "Dr. Veersa Specialist", // Placeholder if API doesn't populate
+    this.doctorName = "Dr. Veersa Specialist",
     this.clinicName = "Veersa Health Clinic",
     this.address = "123 Health St, Panipat",
     this.doctorImage = ImageStringsConstants.avatar3,
@@ -39,16 +38,17 @@ class AppointmentModel {
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       status: _parseStatus(json['status']),
-      // If your backend eventually sends populated DTOs, map them here:
-      // doctorName: json['doctorName'] ?? "Unknown",
     );
   }
 
   static AppointmentStatus _parseStatus(String? status) {
     switch (status?.toUpperCase()) {
-      case 'COMPLETED': return AppointmentStatus.COMPLETED;
-      case 'CANCELLED': return AppointmentStatus.CANCELLED;
-      default: return AppointmentStatus.BOOKED;
+      case 'COMPLETED':
+        return AppointmentStatus.COMPLETED;
+      case 'CANCELLED':
+        return AppointmentStatus.CANCELLED;
+      default:
+        return AppointmentStatus.BOOKED;
     }
   }
 }

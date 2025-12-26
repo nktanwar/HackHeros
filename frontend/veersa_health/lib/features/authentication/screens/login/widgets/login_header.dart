@@ -15,8 +15,8 @@ class LoginHeader extends StatelessWidget {
       children: [
         Image(
           image: AssetImage(ImageStringsConstants.appIcon),
-          height: 120,
-          width: 120,
+          height: 100,
+          width: 100,
         ),
         const SizedBox(height: SizeConstants.spaceBtwSections + 18),
         //Login Title and subtitle

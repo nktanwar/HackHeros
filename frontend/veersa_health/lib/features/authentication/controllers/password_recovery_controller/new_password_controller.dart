@@ -4,7 +4,7 @@ import 'package:veersa_health/data/repository/authentication_repository.dart';
 import 'package:veersa_health/features/authentication/screens/password_recovery/password_success_screen.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
-import 'package:veersa_health/utils/popups/full_screen_loader.dart';
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
 
 class NewPasswordController extends GetxController {
   static NewPasswordController get instance => Get.find();
@@ -48,6 +48,7 @@ class NewPasswordController extends GetxController {
 
       Get.offAll(() => const PasswordSuccessScreen());
     } catch (e) {
+      debugPrint("Error =============================== $e");
       CustomFullScreenLoader.closeLoadingDialog();
       CustomLoaders.errorSnackBar(title: "Error", message: e.toString());
     }

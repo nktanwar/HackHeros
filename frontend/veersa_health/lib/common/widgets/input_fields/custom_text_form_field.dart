@@ -51,9 +51,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           left: SizeConstants.defaultSpace - 16,
           right: SizeConstants.defaultSpace - 16,
           top: SizeConstants.defaultSpace - 16,
-          bottom: SizeConstants.defaultSpace - 8,
+          bottom: SizeConstants.defaultSpace - 20,
         ),
-        height: SizeConstants.buttonHeight,
+        height: SizeConstants.buttonHeight+10,
         decoration: BoxDecoration(
           color: ColorConstants.whiteBackground,
           border: BoxBorder.all(

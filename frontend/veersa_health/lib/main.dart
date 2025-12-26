@@ -15,12 +15,13 @@ import 'package:veersa_health/utils/theme/theme.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
+  debugPrint("Handling a background message: ${message.messageId}");
 }
+
 Future<void> main() async {
   final WidgetsBinding widgetsBinding =
       WidgetsFlutterBinding.ensureInitialized();
-      Get.put(OnBoardingController());
+  Get.put(OnBoardingController());
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
@@ -28,20 +29,19 @@ Future<void> main() async {
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyBWJgkaivBNCMzWAHWSLGN4LBZaBubtfxc", 
-        appId: "1:1085093547710:android:6504a892799d33432758ef", 
-        messagingSenderId: "1085093547710", 
+        apiKey: "AIzaSyBWJgkaivBNCMzWAHWSLGN4LBZaBubtfxc",
+        appId: "1:1085093547710:android:6504a892799d33432758ef",
+        messagingSenderId: "1085093547710",
         projectId: "healthapp-a449d",
         storageBucket: "healthapp-a449d.firebasestorage.app",
       ),
-    );
+    ).then((FirebaseApp value) {
+      return Get.put(AuthenticationRepository());
+    });
   }
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  Get.put(AuthenticationRepository());
   runApp(const MyApp());
 }
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -53,8 +53,7 @@ class MyApp extends StatelessWidget {
       title: 'Veersa Health',
       initialBinding: GeneralBindings(),
       theme: CustomAppTheme.appTheme,
-      home:const Scaffold(body: Center(child: CircularProgressIndicator())),
+      home: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 }
-
