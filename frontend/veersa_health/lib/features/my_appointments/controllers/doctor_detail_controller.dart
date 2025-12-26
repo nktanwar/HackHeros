@@ -1,26 +1,39 @@
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart'; // Add share_plus to pubspec
+import 'package:veersa_health/features/home/models/doctor_model.dart';
 import 'package:veersa_health/features/my_appointments/screens/schedule/schedule_appointment_screen.dart';
 
 class DoctorDetailController extends GetxController {
-  // Observables for Doctor Data
-  final doctorName = "Dr. Priya Sharma".obs;
-  final speciality = "Cardiologist".obs;
-  final experience = "12+ years of experience".obs;
-  final bio = "Dr. Priya Sharma is a highly skilled cardiologist with over 12 years of experience in diagnosing and managing various heart conditions. She specializes in treating cardiovascular diseases such as coronary artery disease, heart failure, and arrhythmias.".obs;
+  // Observables
+  final doctorData = Rxn<DoctorModel>();
   
-  // Fees and Location
-  final consultationFee = 80.obs; // Int for easy calculation later
-  final distance = "800m".obs; // Distance tag as requested
-  final clinicName = "HeartCare Clinic".obs;
-  final address = "123 Health St, Suite 45, City, State, 560091".obs;
+  // Computed variables for UI
+  String get doctorName => doctorData.value?.clinicName ?? "Doctor"; // Fallback as API gives clinicName
+  String get specialty => doctorData.value?.specialty ?? "Specialist";
+  String get address => "123 Health St, Suite 45"; // Mock address
+  double get fees => doctorData.value?.fees ?? 500.0;
+  String get distance => "${doctorData.value?.distanceInKm ?? 0} km";
 
-  // Actions
-  void shareProfile() {
-    // Add share logic here
-    print("Profile Shared");
+  @override
+  void onInit() {
+    super.onInit();
+    if(Get.arguments is DoctorModel) {
+      doctorData.value = Get.arguments;
+    }
   }
 
-void navigateToBooking() {
-  Get.to(() => const ScheduleAppointmentScreen());
-}
+  void shareProfile() {
+    if(doctorData.value == null) return;
+    Share.share("Check out $doctorName at $address. Book via Veersa Health!");
+  }
+
+  void navigateToBooking() {
+    if(doctorData.value != null) {
+      Get.to(
+        () => const ScheduleAppointmentScreen(),
+        // Pass Doctor ID for the Booking API
+        arguments: {'doctorId': doctorData.value!.doctorId} 
+      );
+    }
+  }
 }

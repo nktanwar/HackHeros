@@ -1,4 +1,4 @@
-// lib/features/home/screens/search/widgets/filter_bottom_sheet.dart
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,20 +13,25 @@ class FilterBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<SearchLogicController>();
     
-    // Extract unique specialities for the filter list
+    
     final specialitiesList = ImageStringsConstants.specialities.map((e) => e['name']!).toList();
+    
+    
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
+      
+      height: screenHeight * 0.6, 
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -39,43 +44,56 @@ class FilterBottomSheet extends StatelessWidget {
           ),
           const Divider(),
           const SizedBox(height: 10),
-
-          // 1. Sort By Section
-          const Text("Sort By", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 10),
-          Obx(() => Wrap(
-            spacing: 10,
-            children: [
-              _buildFilterChip(
-                label: "Nearest Doctors",
-                isSelected: controller.selectedSort.value == SortOption.nearest,
-                onSelected: (val) => controller.setSortOption(val ? SortOption.nearest : null),
+      
+          
+          
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  
+                  const Text("Sort By", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 10),
+                  Obx(() => Wrap(
+                    spacing: 10,
+                    children: [
+                      _buildFilterChip(
+                        label: "Nearest Doctors",
+                        isSelected: controller.selectedSort.value == SortOption.nearest,
+                        onSelected: (val) => controller.setSortOption(val ? SortOption.nearest : null),
+                      ),
+                      _buildFilterChip(
+                        label: "Lowest Fees",
+                        isSelected: controller.selectedSort.value == SortOption.lowestFees,
+                        onSelected: (val) => controller.setSortOption(val ? SortOption.lowestFees : null),
+                      ),
+                    ],
+                  )),
+              
+                  const SizedBox(height: 20),
+              
+                  
+                  const Text("Speciality", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 10),
+                  Obx(() => Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: specialitiesList.map((spec) {
+                      return _buildFilterChip(
+                        label: spec,
+                        isSelected: controller.selectedSpeciality.value == spec,
+                        onSelected: (val) => controller.setSpeciality(val ? spec : null),
+                      );
+                    }).toList(),
+                  )),
+                  
+                  
+                  const SizedBox(height: 40),
+                ],
               ),
-              _buildFilterChip(
-                label: "Lowest Fees",
-                isSelected: controller.selectedSort.value == SortOption.lowestFees,
-                onSelected: (val) => controller.setSortOption(val ? SortOption.lowestFees : null),
-              ),
-            ],
-          )),
-
-          const SizedBox(height: 20),
-
-          // 2. Speciality Section
-          const Text("Speciality", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 10),
-          Obx(() => Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: specialitiesList.map((spec) {
-              return _buildFilterChip(
-                label: spec,
-                isSelected: controller.selectedSpeciality.value == spec,
-                onSelected: (val) => controller.setSpeciality(val ? spec : null),
-              );
-            }).toList(),
-          )),
-          const SizedBox(height: 20),
+            ),
+          ),
         ],
       ),
     );

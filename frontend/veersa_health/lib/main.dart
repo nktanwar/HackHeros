@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -6,22 +8,40 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:veersa_health/bindings/general_bindings.dart';
+import 'package:veersa_health/data/repository/authentication_repository.dart';
 import 'package:veersa_health/features/authentication/controllers/onboarding/onboarding_controller.dart';
-import 'package:veersa_health/features/authentication/screens/login/login_screen.dart';
 import 'package:veersa_health/utils/theme/theme.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("Handling a background message: ${message.messageId}");
+}
 
 Future<void> main() async {
   final WidgetsBinding widgetsBinding =
       WidgetsFlutterBinding.ensureInitialized();
-      Get.put(OnBoardingController());
+  Get.put(OnBoardingController());
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
   await GetStorage.init();
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyBWJgkaivBNCMzWAHWSLGN4LBZaBubtfxc",
+        appId: "1:1085093547710:android:6504a892799d33432758ef",
+        messagingSenderId: "1085093547710",
+        projectId: "healthapp-a449d",
+        storageBucket: "healthapp-a449d.firebasestorage.app",
+      ),
+    ).then((FirebaseApp value) {
+      return Get.put(AuthenticationRepository());
+    });
+  }
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -33,8 +53,7 @@ class MyApp extends StatelessWidget {
       title: 'Veersa Health',
       initialBinding: GeneralBindings(),
       theme: CustomAppTheme.appTheme,
-      home:LoginScreen(),
+      home: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 }
-

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:veersa_health/data/repository/authentication_repository.dart';
 import 'package:veersa_health/features/home/screens/home/home_screen.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
+import 'package:veersa_health/utils/helpers/network_manager.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
-import 'package:veersa_health/utils/popups/full_screen_loader.dart';
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find();
@@ -20,10 +22,7 @@ class LoginController extends GetxController {
     showPassword.value = !showPassword.value;
   }
 
-  // final AuthenticationRepository _authRepo = Get.put(
-  //   AuthenticationRepository(),
-  // );
-  // final UserRepository _userRepo = UserRepository.instance;
+  final AuthenticationRepository _authRepo = AuthenticationRepository.instance;
 
   @override
   void onInit() {
@@ -38,15 +37,12 @@ class LoginController extends GetxController {
 
   Future<void> signIn() async {
     try {
-      // if (!formKey.currentState!.validate()) {
-      //   return;
-      // }
-
-      // final isConnected = await NetworkManager.instance.isConnected();
-      // if (!isConnected) {
-      //   CustomLoaders.customToast(message: 'No internet connection.');
-      //   return;
-      // }
+      if (!formKey.currentState!.validate()) return;
+      final isConnected = await NetworkManager.instance.isConnected();
+      if (!isConnected) {
+        CustomLoaders.customToast(message: 'No internet connection.');
+        return;
+      }
 
       CustomFullScreenLoader.openLoadingDialog(
         "Logging you in...",
@@ -66,20 +62,19 @@ class LoginController extends GetxController {
         deviceStorage.remove('REMEMBER_ME_PASSWORD');
       }
 
-      // await _authRepo.login(
-      //   emailController.text.trim(),
-      //   passwordController.text.trim(),
-      // );
+      await _authRepo.login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
 
       CustomFullScreenLoader.closeLoadingDialog();
-
-      Get.offAll(HomeScreen());
-      // _authRepo.screenRedirect();
+      Get.offAll(() => const HomeScreen());
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
+      debugPrint("Error ===================================== $e");
       CustomLoaders.errorSnackBar(
-        title: "Something went wrong!",
-        message: e.toString(),
+        title: "Login Failded",
+        message: "Invalid Credentials!",
       );
     }
   }

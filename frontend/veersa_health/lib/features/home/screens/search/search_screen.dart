@@ -14,10 +14,14 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Inject the Hybrid Controller
     final controller = Get.put(SearchLogicController());
 
+    // Handle arguments passed from Home Screen (e.g., View All Specialities)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.clearAllFilters();
+      // Reset filters when entering fresh
+      // Note: If you want to keep state when going back/forth, remove clearAllFilters()
+      // controller.clearAllFilters(); 
 
       final args = Get.arguments;
       if (args != null) {
@@ -40,17 +44,27 @@ class SearchScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              
+              // 1. Search Bar
               SearchFieldWithFilter(
                 onFilterTap: () => _showFilterSheet(context),
               ),
               const SizedBox(height: 24),
 
+              // 2. Results Area
               Expanded(
                 child: Obx(() {
+                  // A. Show Loading Spinner
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  // B. Show Categories if no search is active
                   if (!controller.showResultsView) {
                     return _buildCategoryGrid(controller);
-                  } else {
+                  } 
+                  
+                  // C. Show Filtered Results
+                  else {
                     return _buildSearchResultsList(controller);
                   }
                 }),
@@ -71,6 +85,7 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
+  // --- Widget: Category Grid (Unchanged) ---
   Widget _buildCategoryGrid(SearchLogicController controller) {
     final categories = ImageStringsConstants.specialities;
     return Column(
@@ -114,27 +129,59 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
+  // --- Widget: Search Results List (UPDATED) ---
   Widget _buildSearchResultsList(SearchLogicController controller) {
     if (controller.filteredDoctors.isEmpty) {
-      return const Center(child: Text("No doctors found"));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.search_off, size: 50, color: Colors.grey),
+            const SizedBox(height: 10),
+            Text(
+              "No doctors found.",
+              style: TextStyle(color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+      );
     }
+
     return ListView.separated(
       itemCount: controller.filteredDoctors.length,
       separatorBuilder: (_, _) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
+        // Get the specific doctor model
         final doc = controller.filteredDoctors[index];
+        
         return DoctorCard(
-          doctorName: doc.name,
-          doctorSpeciality: doc.speciality,
-          imageUrl: doc.image,
-          distance: "${doc.distanceKm} km away",
-          fees: "Fees: Rs ${doc.fees}",
+          // Mapped 'clinicName' to 'doctorName' parameter if your card expects that
+          // Or update DoctorCard to accept 'clinicName'
+          doctorName: doc.clinicName, 
+          doctorSpeciality: doc.specialty,
+          imageUrl: doc.image, // Uses default placeholder from model
+          
+          // Formatted Distance
+          distance: "${doc.distanceInKm.toStringAsFixed(1)} km away",
+          
+          // Formatted Fees
+          fees: "Fees: Rs ${doc.fees.toInt()}",
+          
           onScheduleTap: () {
-                Get.to(() => const ScheduleAppointmentScreen());
-              },
+            Get.to(
+              () => const ScheduleAppointmentScreen(),
+              arguments: {
+                'doctorId': doc.doctorId,
+                'clinicName': doc.clinicName,
+              }
+            );
+          },
           onCardTap: () {
-                Get.to(() => const DoctorDetailScreen());
-              },
+            Get.to(
+              () => const DoctorDetailScreen(),
+              arguments: doc // Pass the full model object
+            );
+          },
         );
       },
     );

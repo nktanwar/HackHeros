@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:veersa_health/common/widgets/buttons/custom_elevated_button.dart';
-import 'package:veersa_health/features/authentication/screens/password_recovery/password_reset_screen.dart';
+import 'package:veersa_health/features/authentication/controllers/password_recovery_controller/reset_password_otp_controller.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 import 'package:veersa_health/utils/constants/size_constants.dart';
 
-class OtpVerificationScreen extends StatelessWidget {
-  const OtpVerificationScreen({super.key});
+class ResetPasswordOtpScreen extends StatelessWidget {
+  const ResetPasswordOtpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 1. Inject the Controller
+    final controller = Get.put(ResetPasswordOtpController());
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -21,7 +22,7 @@ class OtpVerificationScreen extends StatelessWidget {
         leading: IconButton(
           style: IconButton.styleFrom(backgroundColor: ColorConstants.grey),
           onPressed: () => Get.back(),
-          icon: Icon(Iconsax.arrow_left, weight: 600, color: Colors.black),
+          icon: const Icon(Iconsax.arrow_left, weight: 600, color: Colors.black),
         ),
       ),
       backgroundColor: ColorConstants.backgroundColor,
@@ -55,9 +56,10 @@ class OtpVerificationScreen extends StatelessWidget {
                           style: TextStyle(fontSize: 14, color: Colors.black54),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          "sk4155765@gmail.com",
-                          style: TextStyle(
+                        // 2. Display Dynamic Email from Controller
+                        Text(
+                          controller.email, 
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
@@ -97,7 +99,11 @@ class OtpVerificationScreen extends StatelessWidget {
                     width: size.width * 0.12,
                     height: 50,
                     child: TextFormField(
+                      // 3. Update Controller Logic on Change
                       onChanged: (value) {
+                        controller.setOtpDigit(index, value);
+                        
+                        // Handle Focus Logic
                         if (value.length == 1 && index < 5) {
                           FocusScope.of(context).nextFocus();
                         } else if (value.isEmpty && index > 0) {
@@ -139,7 +145,7 @@ class OtpVerificationScreen extends StatelessWidget {
               const SizedBox(height: 30),
 
               const Text(
-                "Didn’t get the code? Resend in 00:27",
+                "Didn’t get the code? Resend in 00:27", // You can make this dynamic later like in signup if needed
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorConstants.primaryTextColor,
@@ -149,7 +155,9 @@ class OtpVerificationScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               InkWell(
+                // 4. Implement Resend Logic (Optional, can call controller method)
                 onTap: () {
+                    // controller.resendOtp(); // Implement in controller if API exists
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -172,7 +180,12 @@ class OtpVerificationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2 * SizeConstants.spaceBtwSections),
-              CustomElevatedButton(onPressed: ()=>Get.to(PasswordResetScreen()), child: Text("NEXT")),
+              
+              // 5. Connect Button to Controller Verify Function
+              CustomElevatedButton(
+                onPressed: () => controller.verifyOtp(), 
+                child: const Text("NEXT"),
+              ),
             ],
           ),
         ),
@@ -180,5 +193,3 @@ class OtpVerificationScreen extends StatelessWidget {
     );
   }
 }
-
-
