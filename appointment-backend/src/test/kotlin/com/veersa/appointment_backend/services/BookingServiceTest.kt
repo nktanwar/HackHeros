@@ -66,4 +66,50 @@ class BookingServiceTest {
             bookingService.bookAppointment(patientId, request)
         }
     }
+
+
+    @Test
+    fun `should NOT allow booking if patient already has an overlapping appointment`() {
+
+        // GIVEN
+        val doctorId = "doctor-2"
+        val patientId = "patient-1"
+
+        val start = Instant.parse("2025-01-01T11:00:00Z")
+        val end   = Instant.parse("2025-01-01T11:30:00Z")
+
+        val request = BookAppointmentRequest(
+            doctorId = doctorId,
+            startTime = start,
+            endTime = end
+        )
+
+        // Doctor is free
+        Mockito.`when`(
+            appointmentRepository
+                .existsByDoctorIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                    doctorId,
+                    AppointmentStatus.BOOKED,
+                    end,
+                    start
+                )
+        ).thenReturn(false)
+
+        // Patient already has a booking
+        Mockito.`when`(
+            appointmentRepository
+                .existsByPatientIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                    patientId,
+                    AppointmentStatus.BOOKED,
+                    end,
+                    start
+                )
+        ).thenReturn(true)
+
+        // WHEN + THEN
+        assertThrows(SlotAlreadyBookedException::class.java) {
+            bookingService.bookAppointment(patientId, request)
+        }
+    }
+
 }
