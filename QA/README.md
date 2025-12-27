@@ -78,8 +78,8 @@ To set up this project locally for evaluation:
 ## 📂 Deliverables & Documentation
 Per the hackathon guidelines, all required documents are attached below:
 
-* 📄 **[Quality Assurance & Test Report](./QA_Testing_Report.md)** (Contains Manual Test Cases & Bug Report)
-* 🎨 **[Design Architecture](./DESIGN.md)** (Figma Links & User Flow)
+* 📄 **[Quality Assurance & Test Report](https://github.com/nktanwar/HackHeros/blob/main/QA/QA_TESTING_REPORT.md)** (Contains Manual Test Cases & Bug Report)
+* 🎨 **[Design Architecture](https://github.com/nktanwar/HackHeros/blob/main/QA/design.md)** (Figma Links & User Flow)
 * 📹 **[Presentation Video](https://drive.google.com/file/d/1mLfcZNTHX90YadbyT_h3lnuGKhd7zJ1z/view?usp=drivesdk)**
 * 📹 **[Presentation Video](https://drive.google.com/file/d/11jvxpigae9cd2t-mryzytgxk9YGjgUh8/view?usp=drive_link)**
 
