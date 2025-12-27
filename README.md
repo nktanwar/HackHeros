@@ -5,6 +5,11 @@
 
 The system is engineered for **scalability and reliability**, mirroring real-world healthcare demands. This repository contains the complete frontend, backend, and QA documentation structured for hackathon evaluation.
 
+
+***🎥 ***Project Demo Video (5 Minutes)***  ***
+👉 https://drive.google.com/file/d/1mLfcZNTHX90YadbyT_h3lnuGKhd7zJ1z/view?usp=drivesdk
+
+
 ---
 
 ## 📁 Repository Structure
