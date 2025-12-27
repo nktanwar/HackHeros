@@ -11,3 +11,7 @@ data class ErrorResponse(
     val message: String,
     val path: String
 )
+
+class SlotAlreadyBookedException(
+    message: String = "This time slot is already booked"
+) : RuntimeException(message)

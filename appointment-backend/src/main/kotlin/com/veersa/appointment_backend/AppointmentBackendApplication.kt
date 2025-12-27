@@ -4,26 +4,30 @@ import com.veersa.appointment_backend.config.JwtProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Bean
+import jakarta.annotation.PostConstruct
 import org.springframework.data.mongodb.core.MongoTemplate
-import com.mongodb.client.MongoClients
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+
 
 @EnableConfigurationProperties(JwtProperties::class)
 @SpringBootApplication
-class AppointmentBackendApplication {
-
-	@Value("\${spring.data.mongodb.uri:mongodb://localhost:27017/test}")
-	private lateinit var mongoUri: String
-
-	@Bean
-	fun mongoTemplate(): MongoTemplate {
-		// If URI is found, it uses Atlas; otherwise, it falls back to a default to prevent crash
-		val mongoClient = MongoClients.create(mongoUri)
-		return MongoTemplate(mongoClient, "healthApp")
-	}
-}
+class AppointmentBackendApplication
 
 fun main(args: Array<String>) {
 	runApplication<AppointmentBackendApplication>(*args)
+}
+
+/**
+ * Debug helper — KEEP THIS
+ * This proves which DB you are connected to
+ */
+@Component
+class MongoDebug(
+	private val mongoTemplate: MongoTemplate
+) {
+	@PostConstruct
+	fun debug() {
+		println("CONNECTED DB = ${mongoTemplate.db.name}")
+		println("COLLECTIONS = ${mongoTemplate.db.listCollectionNames().toList()}")
+	}
 }

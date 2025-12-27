@@ -1,7 +1,10 @@
 package com.veersa.appointment_backend.controllers
+import com.veersa.appointment_backend.dto.ForgotPasswordRequest
 import com.veersa.appointment_backend.dto.LoginRequest
 import com.veersa.appointment_backend.dto.LoginResponse
+import com.veersa.appointment_backend.dto.ResetPasswordRequest
 import com.veersa.appointment_backend.dto.SignupRequest
+import com.veersa.appointment_backend.dto.VerifyResetOtpRequest
 import com.veersa.appointment_backend.dto.sendOtpDto
 import com.veersa.appointment_backend.dto.verifyOtpDto
 import com.veersa.appointment_backend.services.AuthService
@@ -15,7 +18,9 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/auth")
 class AuthController(
     private val authService: AuthService,
-    private val emailOtpService: EmailOtpService
+    private val emailOtpService: EmailOtpService,
+    private val passwordResetService: AuthService,
+
 ) {
 
     @PostMapping("/signup")
@@ -40,6 +45,8 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
+
+
     @PostMapping("/send-email-otp")
     fun sendEmailOtp(
         @Valid @RequestBody request: sendOtpDto
@@ -62,6 +69,45 @@ class AuthController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body("Email verified successfully")
+    }
+
+
+    @PostMapping("/forgot-password")
+    fun forgotPassword(
+        @RequestBody request: ForgotPasswordRequest
+    ) = ResponseEntity.ok(
+        "OTP sent to registered email"
+    ).also {
+        emailOtpService.sendOtp(request.email)
+    }
+
+    @PostMapping("/verify-reset-otp")
+    fun verifyResetOtp(
+        @RequestBody request: VerifyResetOtpRequest
+    ) = ResponseEntity.ok(
+        "OTP verified"
+    ).also {
+        emailOtpService.verifyOtpForPasswordReset(
+            request.email,
+            request.otp
+        )
+    }
+
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @RequestBody request: ResetPasswordRequest
+    ) = ResponseEntity.ok(
+        "Password reset successfully. Please login again."
+    ).also {
+        passwordResetService.resetPassword(
+            request.email,
+            request.newPassword
+        )
+    }
+
+    @GetMapping("/health")
+    fun healthCheck(): ResponseEntity<String> {
+        return ResponseEntity.ok("App is running")
     }
 
 

@@ -24,11 +24,15 @@ class DoctorSearchRepositoryImpl(
         maxDistanceKm: Double
     ): List<DoctorSearchResult> {
 
-        // 1️⃣ Build NearQuery (THIS is what geoNear expects)
+        val earthRadiusKm = 6371.0
+
         val nearQuery = NearQuery.near(
             GeoJsonPoint(longitude, latitude)
         )
-            .maxDistance(maxDistanceKm * 1000) // meters
+            // maxDistance must be in RADIANS
+            .maxDistance(maxDistanceKm / earthRadiusKm)
+            // 🔥 THIS is where distance is converted
+            .distanceMultiplier(earthRadiusKm)
             .query(
                 Query(
                     Criteria.where("specialty").`is`(specialty)
@@ -38,31 +42,65 @@ class DoctorSearchRepositoryImpl(
             )
             .spherical(true)
 
-        // 2️⃣ geoNear aggregation stage
         val geoNearStage = Aggregation.geoNear(
             nearQuery,
-            "distanceInMeters"
+            "distanceInKm"   // already in KM
         )
 
-        // 3️⃣ Projection
         val projectStage = project()
             .and("doctorId").`as`("doctorId")
             .and("clinicName").`as`("clinicName")
             .and("specialty").`as`("specialty")
-            .and("distanceInMeters").divide(1000).`as`("distanceInKm")
+            .and("distanceInKm").`as`("distanceInKm")
+            .and("clinicLocation.coordinates").arrayElementAt(1).`as`("latitude")
+            .and("clinicLocation.coordinates").arrayElementAt(0).`as`("longitude")
 
         val aggregation = Aggregation.newAggregation(
             geoNearStage,
             projectStage
         )
 
-        val results: AggregationResults<DoctorSearchResult> =
-            mongoTemplate.aggregate(
-                aggregation,
-                "doctor_profiles",
-                DoctorSearchResult::class.java
-            )
-
-        return results.mappedResults
+        return mongoTemplate.aggregate(
+            aggregation,
+            "doctor_profiles",
+            DoctorSearchResult::class.java
+        ).mappedResults
     }
+
+    override fun findAllDoctors(
+        page: Int,
+        size: Int
+    ): List<DoctorSearchResult> {
+
+        val skip = page * size
+
+        val matchStage = Aggregation.match(
+            Criteria.where("active").`is`(true)
+                .and("isComplete").`is`(true)
+        )
+
+        val projectStage = project()
+            .and("doctorId").`as`("doctorId")
+            .and("clinicName").`as`("clinicName")
+            .and("specialty").`as`("specialty")
+            .and("clinicLocation.coordinates").arrayElementAt(1).`as`("latitude")
+            .and("clinicLocation.coordinates").arrayElementAt(0).`as`("longitude")
+            // distance is not applicable here
+            .andExclude("_id")
+
+        val aggregation = Aggregation.newAggregation(
+            matchStage,
+            Aggregation.skip(skip.toLong()),
+            Aggregation.limit(size.toLong()),
+            projectStage
+        )
+
+        return mongoTemplate.aggregate(
+            aggregation,
+            "doctor_profiles",
+            DoctorSearchResult::class.java
+        ).mappedResults
+    }
+
+
 }

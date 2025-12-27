@@ -11,7 +11,8 @@ class UserPrincipal(
     val email: String,
     val phoneNumber: String,
     val role: String,
-    val verified: Boolean
+    val verified: Boolean,
+    val tokenVersion : Long
 ) : UserDetails {
 
     override fun getAuthorities(): Collection<GrantedAuthority> =

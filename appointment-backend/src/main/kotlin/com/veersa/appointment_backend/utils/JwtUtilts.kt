@@ -22,6 +22,8 @@ class JwtUtils(
         claims["phoneNumber"] = user.phoneNumber
         claims["role"] = user.role
         claims["verified"] = user.verified
+        claims["tokenVersion"] = user.tokenVersion
+
 
         val now = Date()
         val expiry = Date(now.time + jwtProperties.expirationMs)
@@ -47,7 +49,8 @@ class JwtUtils(
             email = claims["email"] as String,
             phoneNumber = claims["phoneNumber"] as String,
             role = claims["role"] as String,
-            verified = claims["verified"] as Boolean
+            verified = claims["verified"] as Boolean,
+            tokenVersion = (claims["tokenVersion"] as Number).toLong()
         )
     }
 
