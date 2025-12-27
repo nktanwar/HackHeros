@@ -85,6 +85,183 @@ maxDistanceKm=100
 
 ---
 
+---
+
+## Test Case 3: Get Available Appointment Slots for a Doctor
+
+| Field | Description |
+|------|------------|
+| **API** | `GET /api/doctors/{doctorId}/slots` |
+| **User Role** | PATIENT |
+| **Authentication** | Not Required |
+| **Query Parameters** | `rangeStart`, `rangeEnd` |
+| **Expected Result** | List of available time slots |
+| **Actual Result** | Slots returned successfully |
+| **Status** | ✅ Passed |
+
+---
+
+### Request Details
+
+**Endpoint**
+
+GET /api/doctors/{doctorId}/slots
+
+
+**Path Variable**
+
+
+doctorId = 694d9500f0d7a87b68898acf
+
+
+**Query Parameters**
+
+
+rangeStart=2025-12-26T00:00:00Z
+rangeEnd=2025-12-26T23:59:59Z
+
+
+
+---
+
+### Response Validation
+
+- HTTP Status Code: **200 OK**
+- Response contains a list of available slots
+- Each slot includes:
+    - `startTime`
+    - `endTime`
+- Slots are returned in **chronological order**
+- Slot duration is consistent (30-minute intervals)
+
+---
+
+### Screenshot Evidence
+
+![Slots_Availability_test.png](screenshots/Slots_Availability_test.png)
+
+### Sample Response
+
+```json
+[
+  {
+    "startTime": "2025-12-26T00:00:00Z",
+    "endTime": "2025-12-26T00:30:00Z"
+  },
+  {
+    "startTime": "2025-12-26T00:30:00Z",
+    "endTime": "2025-12-26T01:00:00Z"
+  },
+  {
+    "startTime": "2025-12-26T01:00:00Z",
+    "endTime": "2025-12-26T01:30:00Z"
+  }
+]
+
+
+```
+---
+
+## Test Case 4: Book Appointment (Conflict – Slot Already Booked)
+
+| Field | Description |
+|------|------------|
+| **API** | `POST /api/appointments/book` |
+| **User Role** | PATIENT |
+| **Authentication** | JWT Bearer Token |
+| **Input** | Doctor ID and time slot already booked |
+| **Expected Result** | Booking rejected with conflict error |
+| **Actual Result** | Conflict error returned |
+| **Status** | ✅ Passed |
+
+---
+
+### Request Details
+
+**Endpoint**
+
+
+**Request Body**
+```json
+{
+  "doctorId": "694d9500f0d7a87b68898acf",
+  "startTime": "2025-12-27T20:00:00Z",
+  "endTime": "2025-12-27T20:30:00Z"
+}
+
+```
+
+
+Sample Error Response
+```json
+
+{
+  "timestamp": "2025-12-27T13:55:41.844484665",
+  "status": 409,
+  "error": "Conflict",
+  "message": "Doctor is already booked for this time slot",
+  "path": "/api/appointments/book"
+}
+```
+
+### Screenshot Evidence
+
+
+![confict_booking_test.png](screenshots/confict_booking_test.png)
+
+
+
+---
+
+## Test Case 5: User Signup (Patient Registration)
+
+| Field | Description |
+|------|------------|
+| **API** | `POST /api/auth/signup` |
+| **User Role** | PATIENT |
+| **Authentication** | Not Required |
+| **Input** | Valid user registration details |
+| **Expected Result** | User registered successfully |
+| **Actual Result** | User registered |
+| **Status** | ✅ Passed |
+
+---
+
+### Request Details
+
+**Endpoint**
+
+
+
+**Request Body**
+```json
+{
+  "name": "testing",
+  "email": "test@gmail.com",
+  "phoneNumber": "123456789",
+  "password": "tester01",
+  "role": "PATIENT",
+  "latitude": 28.6139,
+  "longitude": 77.2090
+}
+```
+
+***Response Validation***
+---
+HTTP Status Code: 201 Created
+
+User record created successfully
+
+Response confirms successful registration
+---
+***Sample Response***
+User registered successfully
+
+
+### Screenshot Evidence
+
+![signup_test.png](screenshots/signup_test.png)
+
 ## Conclusion
 
 All tested APIs behaved as expected under real-world conditions.  
