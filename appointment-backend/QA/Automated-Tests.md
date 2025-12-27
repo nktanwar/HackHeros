@@ -30,9 +30,15 @@ The following business rules were validated:
 - Ensures invalid booking requests are rejected with proper exceptions
 - Prevents patient from booking overlapping appointments
 
+- Successfully books appointment when no conflicts exist
+- Creates reminder notification for booked appointment
+- Triggers doctor availability recomputation
+
+
 
 These tests load only the required service and mock its dependencies,
 ensuring fast and deterministic test execution.
+
 
 ---
 
@@ -44,6 +50,9 @@ tests using Gradle.
 ![Booking Service Test Result](screenshots/booking-service-test.png)
 
 ![Patient Conflict Test](screenshots/booking-service-patient-conflict.png)
+
+![Happy Path Booking Test](screenshots/booking-service-happy-path.png)
+
 
 
 ---

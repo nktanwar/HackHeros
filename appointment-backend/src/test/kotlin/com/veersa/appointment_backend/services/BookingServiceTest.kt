@@ -2,6 +2,7 @@ package com.veersa.appointment_backend.services
 
 import com.veersa.appointment_backend.dto.BookAppointmentRequest
 import com.veersa.appointment_backend.exception.SlotAlreadyBookedException
+import com.veersa.appointment_backend.models.Appointment
 import com.veersa.appointment_backend.models.AppointmentStatus
 import com.veersa.appointment_backend.repoistory.*
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -111,5 +112,66 @@ class BookingServiceTest {
             bookingService.bookAppointment(patientId, request)
         }
     }
+
+
+    @Test
+    fun `should successfully book appointment when no conflicts exist`() {
+
+        // GIVEN
+        val doctorId = "doctor-3"
+        val patientId = "patient-2"
+
+        val start = Instant.parse("2025-01-01T12:00:00Z")
+        val end   = Instant.parse("2025-01-01T12:30:00Z")
+
+        val request = BookAppointmentRequest(
+            doctorId = doctorId,
+            startTime = start,
+            endTime = end
+        )
+
+        // No conflicts
+        Mockito.`when`(
+            appointmentRepository
+                .existsByDoctorIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                    doctorId,
+                    AppointmentStatus.BOOKED,
+                    end,
+                    start
+                )
+        ).thenReturn(false)
+
+        Mockito.`when`(
+            appointmentRepository
+                .existsByPatientIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                    patientId,
+                    AppointmentStatus.BOOKED,
+                    end,
+                    start
+                )
+        ).thenReturn(false)
+
+        // Mock appointment save
+        Mockito.`when`(
+            appointmentRepository.save(Mockito.any())
+        ).thenAnswer { invocation ->
+            val appointment = invocation.arguments[0] as Appointment
+            appointment.copy(id = "appointment-123")
+        }
+
+        // WHEN
+        val appointment =
+            bookingService.bookAppointment(patientId, request)
+
+        // THEN
+        assert(appointment.doctorId == doctorId)
+        assert(appointment.patientId == patientId)
+        assert(appointment.status == AppointmentStatus.BOOKED)
+
+        // Verify side effects
+        Mockito.verify(notificationRepository).save(Mockito.any())
+        Mockito.verify(doctorService).recomputeBookableStatus(doctorId)
+    }
+
 
 }
