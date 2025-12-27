@@ -2,6 +2,7 @@ package com.veersa.appointment_backend.controllers
 
 
 
+import com.veersa.appointment_backend.dto.AppointmentViewResponse
 import com.veersa.appointment_backend.dto.BookAppointmentRequest
 import com.veersa.appointment_backend.models.Appointment
 import com.veersa.appointment_backend.services.BookingService
@@ -16,7 +17,7 @@ import com.veersa.appointment_backend.repoistory.AppointmentRepository
 @RequestMapping("/api/appointments")
 class AppointmentController(
     private val bookingService: BookingService,
-    private val appointmentRepository: AppointmentRepository
+    private val appointmentService: BookingService
 ) {
 
     @PreAuthorize("hasRole('PATIENT')")
@@ -34,16 +35,16 @@ class AppointmentController(
 
     @GetMapping("/my")
     fun myAppointments(
-        @AuthenticationPrincipal user: UserPrincipal
-    ): List<Appointment> {
+        @AuthenticationPrincipal user: UserPrincipal,
+        @RequestParam(required = false) latitude: Double?,
+        @RequestParam(required = false) longitude: Double?
+    ): List<AppointmentViewResponse> {
 
-        return when (user.role) {
-            "DOCTOR" ->
-                appointmentRepository.findByDoctorId(user.userId)
-
-            else ->
-                appointmentRepository.findByPatientId(user.userId)
-        }
+        return appointmentService.getMyAppointments(
+            user = user,
+            latitude = latitude,
+            longitude = longitude
+        )
     }
 
 }

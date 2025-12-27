@@ -22,7 +22,9 @@ data class DoctorSearchResult(
     val doctorId: String,
     val specialty: String,
     val clinicName: String,
-    val distanceInKm: Double
+    val distanceInKm: Double?=null,
+    val latitude: Double?=null,
+    val longitude: Double?=null
 )
 
 
@@ -40,4 +42,23 @@ data class DoctorAvailabilityResponse(
     val endTime: Instant,
     val slotDurationMinutes: Int,
     val active: Boolean
+)
+
+data class AppointmentViewResponse(
+    val appointmentId: String,
+    val startTime: Instant,
+    val endTime: Instant,
+    val status: String,
+
+    // doctor info
+    val doctorId: String,
+    val doctorName: String,
+    val specialty: String,
+    val clinicName: String,
+    val mapUrl: String,
+    val distanceInKm: Double?,
+
+    // patient info (only for doctor view)
+    val patientId: String?,
+    val patientName: String?
 )

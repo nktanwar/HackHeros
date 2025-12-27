@@ -12,4 +12,9 @@ interface DoctorSearchRepository {
         specialty: String,
         maxDistanceKm: Double
     ): List<DoctorSearchResult>
+
+    fun findAllDoctors(
+        page: Int,
+        size: Int
+    ): List<DoctorSearchResult>
 }
