@@ -30,6 +30,7 @@ class ProfileScreen extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.black,
+            fontFamily: "Montserrat"
           ),
         ),
       ),

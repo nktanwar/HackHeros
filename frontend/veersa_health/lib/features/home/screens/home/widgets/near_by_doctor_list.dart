@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:veersa_health/common/loaders/shimmer_effect.dart';
 import 'package:veersa_health/features/home/controllers/home_controller.dart';
 import 'package:veersa_health/features/home/screens/home/widgets/doctors_card.dart';
 import 'package:veersa_health/features/my_appointments/screens/schedule/doctor_detail_screen.dart';
@@ -14,15 +15,27 @@ class NearbyDoctorsList extends StatelessWidget {
 
     return Obx(() {
       if (controller.isDataLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return SizedBox(
+          height: 190,
+          child: ListView.separated(
+            itemCount: 3,
+            separatorBuilder: (context, index) => SizedBox(width: 12,),
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (_, _) => CustomShimmerEffect(width: 300, height: 190),
+          ),
+        );
+
       }
 
       if (controller.nearbyDoctors.isEmpty) {
-        return const Center(child: Text("No doctors found nearby"));
+        return Container(
+          color: Colors.white,
+          child: const Center(child: Text("No doctors found nearby")),
+        );
       }
 
       return SizedBox(
-        height: 180, // Slightly increased height for better layout
+        height: 190,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.only(bottom: 10),
@@ -30,24 +43,25 @@ class NearbyDoctorsList extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 16),
           itemBuilder: (context, index) {
             final doctor = controller.nearbyDoctors[index];
-            
+
             return SizedBox(
               width: 300,
               child: DoctorCard(
-                doctorName: doctor.clinicName, // Using Clinic Name as per API
+                clinicName: doctor.clinicName,
                 doctorSpeciality: doctor.specialty,
                 imageUrl: doctor.image,
                 distance: "${doctor.distanceInKm.toStringAsFixed(1)} km",
-                fees: "Fees: Rs ${doctor.fees.toInt()}",
                 onScheduleTap: () {
-                  // Pass doctorId to booking screen
-                  Get.to(() => const ScheduleAppointmentScreen(), arguments: {
-                    'doctorId': doctor.doctorId,
-                    'clinicName': doctor.clinicName
-                  });
+                  Get.to(
+                    () => const ScheduleAppointmentScreen(),
+                    arguments: {
+                      'doctorId': doctor.doctorId,
+                      'clinicName': doctor.clinicName,
+                    },
+                  );
                 },
                 onCardTap: () {
-                   Get.to(() => const DoctorDetailScreen(), arguments: doctor);
+                  Get.to(() => const DoctorDetailScreen(), arguments: doctor);
                 },
               ),
             );

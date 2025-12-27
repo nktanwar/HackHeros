@@ -13,7 +13,7 @@ class ResetPasswordOtpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Inject the Controller
+    // Inject controller
     final controller = Get.put(ResetPasswordOtpController());
     final size = MediaQuery.of(context).size;
 
@@ -33,7 +33,8 @@ class ResetPasswordOtpScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-
+              
+              // Header Row
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -56,7 +57,6 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                           style: TextStyle(fontSize: 14, color: Colors.black54),
                         ),
                         const SizedBox(height: 4),
-                        // 2. Display Dynamic Email from Controller
                         Text(
                           controller.email, 
                           style: const TextStyle(
@@ -68,7 +68,6 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   Expanded(
                     flex: 2,
                     child: SizedBox(
@@ -80,9 +79,9 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
+              
               const SizedBox(height: 40),
-
+              
               const Text(
                 "Enter the verification code here",
                 style: TextStyle(
@@ -91,7 +90,8 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-
+              
+              // OTP Input Fields
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(6, (index) {
@@ -99,11 +99,8 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                     width: size.width * 0.12,
                     height: 50,
                     child: TextFormField(
-                      // 3. Update Controller Logic on Change
                       onChanged: (value) {
                         controller.setOtpDigit(index, value);
-                        
-                        // Handle Focus Logic
                         if (value.length == 1 && index < 5) {
                           FocusScope.of(context).nextFocus();
                         } else if (value.isEmpty && index > 0) {
@@ -141,50 +138,48 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                   );
                 }),
               ),
-
+              
               const SizedBox(height: 30),
-
-              const Text(
-                "Didn’t get the code? Resend in 00:27", // You can make this dynamic later like in signup if needed
-                style: TextStyle(
-                  fontSize: 14,
-                  color: ColorConstants.primaryTextColor,
-                ),
-              ),
-
+              
+              // Timer and Resend Logic
+              Obx(() => Text(
+                  controller.remainingTime.value > 0
+                      ? "Resend in 00:${controller.remainingTime.value.toString().padLeft(2, '0')}"
+                      : "Did not receive code?",
+                  style: const TextStyle(fontSize: 14, color: ColorConstants.primaryTextColor),
+              )),
+              
               const SizedBox(height: 16),
-
+              
               InkWell(
-                // 4. Implement Resend Logic (Optional, can call controller method)
-                onTap: () {
-                    // controller.resendOtp(); // Implement in controller if API exists
-                },
+                onTap: () => controller.resendOTP(),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(
-                      Iconsax.message_notif,
-                      color: ColorConstants.secondaryText,
-                      size: 20,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      "Resend OTP",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: ColorConstants.secondaryText,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                   mainAxisSize: MainAxisSize.min,
+                   children: const [
+                     Icon(
+                       Iconsax.message_notif,
+                       color: ColorConstants.secondaryText,
+                       size: 20,
+                     ),
+                     SizedBox(width: 8),
+                     Text(
+                       "Resend OTP",
+                       style: TextStyle(
+                         fontSize: 16,
+                         color: ColorConstants.secondaryText,
+                         fontWeight: FontWeight.w500,
+                       ),
+                     ),
+                   ],
                 ),
               ),
+
               const SizedBox(height: 2 * SizeConstants.spaceBtwSections),
               
-              // 5. Connect Button to Controller Verify Function
+              // Verify Button
               CustomElevatedButton(
                 onPressed: () => controller.verifyOtp(), 
-                child: const Text("NEXT"),
+                child: const Text("Validate OTP"),
               ),
             ],
           ),

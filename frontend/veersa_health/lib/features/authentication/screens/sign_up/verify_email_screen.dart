@@ -13,17 +13,19 @@ class VerifyEmailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure the controller is put into memory
     final controller = Get.put(VerifyEmailController());
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      // ... existing app bar ...
       appBar: AppBar(
         leading: IconButton(
           style: IconButton.styleFrom(backgroundColor: ColorConstants.grey),
           onPressed: () => Get.back(),
-          icon: const Icon(Iconsax.arrow_left, weight: 600, color: Colors.black),
+          icon: const Icon(
+            Iconsax.arrow_left,
+            weight: 600,
+            color: Colors.black,
+          ),
         ),
       ),
       backgroundColor: ColorConstants.backgroundColor,
@@ -45,35 +47,45 @@ class VerifyEmailScreen extends StatelessWidget {
                       children: [
                         const Text(
                           "Verify Email Address",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        const Text("A 6 digit code has been sent to:", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                        const Text(
+                          "A 6 digit code has been sent to:",
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                        ),
                         const SizedBox(height: 4),
-                        // DYNAMIC EMAIL DISPLAY
+
                         Text(
-                          controller.email, 
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
+                          controller.email,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  // ... Image widget ...
+
                   Expanded(
                     flex: 2,
                     child: SizedBox(
                       height: 150,
-                      child: Image(image: AssetImage(ImageStringsConstants.enterOtp)),
+                      child: Image(
+                        image: AssetImage(ImageStringsConstants.enterOtp),
+                      ),
                     ),
                   ),
                 ],
               ),
-              
-              // ... rest of your UI code ...
-              
+
               const SizedBox(height: 40),
-              
-              // OTP Input Fields
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(6, (index) {
@@ -82,18 +94,19 @@ class VerifyEmailScreen extends StatelessWidget {
                     height: 50,
                     child: TextFormField(
                       onChanged: (value) {
-                        // STORE VALUE IN CONTROLLER
                         controller.setOtpDigit(index, value);
-                        
-                        // Focus Logic
+
                         if (value.length == 1 && index < 5) {
                           FocusScope.of(context).nextFocus();
                         } else if (value.isEmpty && index > 0) {
                           FocusScope.of(context).previousFocus();
                         }
                       },
-                      // ... formatting and styling ...
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -104,40 +117,55 @@ class VerifyEmailScreen extends StatelessWidget {
                         contentPadding: EdgeInsets.zero,
                         filled: true,
                         fillColor: Colors.white,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   );
                 }),
               ),
-              
+
               const SizedBox(height: 30),
-              
-              // Timer and Resend
-              Obx(() => Text(
+
+              Obx(
+                () => Text(
                   controller.remainingTime.value > 0
                       ? "Resend in 00:${controller.remainingTime.value.toString().padLeft(2, '0')}"
                       : "Did not receive code?",
-                  style: const TextStyle(fontSize: 14, color: ColorConstants.primaryTextColor),
-              )),
-              
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: ColorConstants.primaryTextColor,
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 16),
-              
+
               InkWell(
                 onTap: () => controller.resendOTP(),
                 child: Row(
-                   // ... UI for resend button ...
-                   children: const [
-                      Icon(Iconsax.message_notif, color: ColorConstants.secondaryText, size: 20),
-                      SizedBox(width: 8),
-                      Text("Resend OTP", style: TextStyle(fontSize: 16, color: ColorConstants.secondaryText, fontWeight: FontWeight.w500)),
-                   ],
+                  children: const [
+                    Icon(
+                      Iconsax.message_notif,
+                      color: ColorConstants.secondaryText,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Resend OTP",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: ColorConstants.secondaryText,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
               const SizedBox(height: 2 * SizeConstants.spaceBtwSections),
-              
-              // VERIFY BUTTON
+
               CustomElevatedButton(
                 onPressed: () => controller.verifyOTP(),
                 child: const Text("Validate OTP"),

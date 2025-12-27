@@ -22,6 +22,10 @@ class HomeRepository {
       }
     }
 
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied.');
+    }
+
     return await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
@@ -36,7 +40,6 @@ class HomeRepository {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-
         return "${place.street}, ${place.subLocality}, ${place.locality}";
       }
       return "Unknown Location";
@@ -46,34 +49,124 @@ class HomeRepository {
   }
 
   Future<List<DoctorModel>> getNearbyDoctors(
-    double lat,
-    double lng, {
+    double userLat,
+    double userLng, {
     String? specialty,
   }) async {
     try {
+      final allDoctors = await getAllDoctors(page: 0, size: 50);
+
+      for (var doctor in allDoctors) {
+        double distanceInMeters = Geolocator.distanceBetween(
+          userLat,
+          userLng,
+          doctor.latitude,
+          doctor.longitude,
+        );
+        doctor.distanceInKm = distanceInMeters / 1000;
+      }
+
+      List<DoctorModel> filteredList = allDoctors;
+      if (specialty != null && specialty.isNotEmpty) {
+        filteredList = allDoctors
+            .where((d) => d.specialty.toLowerCase() == specialty.toLowerCase())
+            .toList();
+      }
+
+      filteredList.sort((a, b) => a.distanceInKm.compareTo(b.distanceInKm));
+
+      return filteredList;
+    } catch (e) {
+      throw "Error calculating nearby doctors: $e";
+    }
+  }
+
+  Future<List<DoctorModel>> searchDoctors({
+    required double latitude,
+    required double longitude,
+    required double maxDistanceKm,
+    String? specialty,
+  }) async {
+    try {
+      if (latitude == 0.0 || longitude == 0.0) {
+        throw "Invalid location coordinates";
+      }
+
+      final Map<String, dynamic> queryParams = {
+        'latitude': latitude,
+        'longitude': longitude,
+        'maxDistanceKm': maxDistanceKm,
+      };
+
+      if (specialty != null && specialty.isNotEmpty) {
+        queryParams['specialty'] = specialty;
+      }
+
       final response = await _apiService.get(
         '/api/doctors/search',
-        params: {
-          'latitude': lat,
-          'longitude': lng,
-          if (specialty != null) 'specialty': specialty,
-        },
+        params: queryParams,
       );
 
-      List<dynamic> data = response.data;
+      List<dynamic> data;
+      if (response.data is List) {
+        data = response.data;
+      } else if (response.data != null && response.data['data'] is List) {
+        data = response.data['data'];
+      } else {
+        data = [];
+      }
+
+      return data.map((json) => DoctorModel.fromJson(json)).toList();
+    } catch (e) {
+      throw "Error searching doctors: $e";
+    }
+  }
+
+  Future<List<DoctorModel>> getAllDoctors({int page = 0, int size = 10}) async {
+    try {
+      final response = await _apiService.get(
+        '/api/doctors/all',
+        params: {'page': page, 'size': size},
+      );
+
+      List<dynamic> data;
+      if (response.data is List) {
+        data = response.data;
+      } else if (response.data['data'] is List) {
+        data = response.data['data'];
+      } else {
+        data = [];
+      }
+
       return data.map((json) => DoctorModel.fromJson(json)).toList();
     } catch (e) {
       throw "Error fetching doctors: $e";
     }
   }
 
-  Future<List<AppointmentModel>> getMyAppointments() async {
+  Future<List<AppointmentModel>> getMyAppointments(
+    double lat,
+    double lng,
+  ) async {
     try {
-      final response = await _apiService.get('/api/appointments/my');
-      List<dynamic> data = response.data;
+      final response = await _apiService.get(
+        '/api/appointments/my',
+        params: {'latitude': lat, 'longitude': lng},
+      );
+
+      List<dynamic> data;
+
+      if (response.data is List) {
+        data = response.data;
+      } else if (response.data != null && response.data['data'] is List) {
+        data = response.data['data'];
+      } else {
+        data = [];
+      }
+
       return data.map((json) => AppointmentModel.fromJson(json)).toList();
     } catch (e) {
-      throw "Error fetching appointments: $e";
+      return [];
     }
   }
 }

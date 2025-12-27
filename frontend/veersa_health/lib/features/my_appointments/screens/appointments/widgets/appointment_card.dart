@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:veersa_health/features/my_appointments/models/appointment_model.dart';
 
 class AppointmentCard extends StatelessWidget {
-  final AppointmentModel appointment; // Using the new Model
+  final AppointmentModel appointment; 
   final VoidCallback? onTap;
 
   const AppointmentCard({
@@ -16,7 +16,6 @@ class AppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isUpcoming = appointment.status == AppointmentStatus.BOOKED;
     
-    // Derived Date String
     final dateStr = DateFormat('d MMM yyyy').format(appointment.startTime);
     final timeStr = DateFormat('jm').format(appointment.startTime);
 
@@ -45,7 +44,7 @@ class AppointmentCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: Colors.grey.shade200,
-                    // Handle image logic
+                    
                     backgroundImage: NetworkImage(appointment.doctorImage),
                   ),
                   const SizedBox(width: 12),

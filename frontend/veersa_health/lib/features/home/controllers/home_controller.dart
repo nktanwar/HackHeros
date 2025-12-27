@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart'; 
 import 'package:veersa_health/data/repository/home_repository.dart';
 import 'package:veersa_health/features/home/models/doctor_model.dart';
 import 'package:veersa_health/features/my_appointments/models/appointment_model.dart';
@@ -10,7 +11,6 @@ class HomeController extends GetxController {
   
   final _repo = HomeRepository();
 
-  // Observables
   var address = "Fetching location...".obs;
   var isFetchingLocation = true.obs;
   var isDataLoading = false.obs;
@@ -18,7 +18,6 @@ class HomeController extends GetxController {
   var nearbyDoctors = <DoctorModel>[].obs;
   var upcomingAppointments = <AppointmentModel>[].obs;
 
-  // Stored Coordinates for Search Screen use
   double? currentLat;
   double? currentLng;
 
@@ -32,19 +31,16 @@ class HomeController extends GetxController {
     try {
       isFetchingLocation.value = true;
       
-      // 1. Get Lat/Lng
       Position pos = await _repo.getCurrentLocation();
       currentLat = pos.latitude;
       currentLng = pos.longitude;
 
-      // 2. Get Readable Address (Async)
       _repo.getAddressFromLatLng(pos).then((value) => address.value = value);
 
-      // 3. Fetch Data based on location
       await fetchDashboardData();
 
     } catch (e) {
-      address.value = "Location Error: Enable GPS";
+      address.value = "Location Error";
       debugPrint("Location Error: $e");
     } finally {
       isFetchingLocation.value = false;
@@ -52,35 +48,46 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchDashboardData() async {
-    if (currentLat == null) return;
+    if (currentLat == null || currentLng == null) return;
     
     isDataLoading.value = true;
     try {
-      // Parallel Execution for efficiency
+      
       final results = await Future.wait([
         _repo.getNearbyDoctors(currentLat!, currentLng!),
-        _repo.getMyAppointments(),
+        _repo.getMyAppointments(currentLat!, currentLng!), 
       ]);
 
-      // Assign Doctors
-      nearbyDoctors.assignAll(results[0] as List<DoctorModel>);
+      final doctors = results[0] as List<DoctorModel>;
+      final myAppointments = results[1] as List<AppointmentModel>;
 
-      // Filter Upcoming Appointments (Start Time > Now)
-      List<AppointmentModel> allAppts = results[1] as List<AppointmentModel>;
-      upcomingAppointments.assignAll(
-        allAppts.where((appt) => 
-          appt.startTime.isAfter(DateTime.now()) && 
-          appt.status != 'CANCELLED'
-        ).toList()
-      );
+      nearbyDoctors.assignAll(doctors);
       
-      // Sort upcoming by soonest first
-      upcomingAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
+      
+      final upcoming = myAppointments.where((appt) => 
+          appt.startTime.isAfter(DateTime.now()) && 
+          appt.status != AppointmentStatus.CANCELLED 
+        ).toList();
+        
+      
+      upcoming.sort((a, b) => a.startTime.compareTo(b.startTime));
+      
+      upcomingAppointments.assignAll(upcoming);
 
     } catch (e) {
       debugPrint("Error loading dashboard: $e");
     } finally {
       isDataLoading.value = false;
+    }
+  }
+
+  
+  Future<void> launchMapUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar("Error", "Could not launch map");
     }
   }
 }

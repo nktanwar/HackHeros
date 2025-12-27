@@ -1,27 +1,15 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:veersa_health/data/service/api_service.dart';
-import 'package:veersa_health/features/my_appointments/models/appointment_model.dart';
 import 'package:veersa_health/features/my_appointments/models/slot_model.dart';
 
 class AppointmentRepository extends GetxService {
   static AppointmentRepository get instance => Get.find();
   final ApiService _apiService = ApiService();
 
-  // 1. Get My Appointments
-  Future<List<AppointmentModel>> getMyAppointments() async {
-    try {
-      final response = await _apiService.get('/api/appointments/my');
-      List<dynamic> data = response.data;
-      return data.map((e) => AppointmentModel.fromJson(e)).toList();
-    } catch (e) {
-      throw 'Error fetching appointments: $e';
-    }
-  }
-
-  // 2. Get Doctor Slots
   Future<List<SlotModel>> getDoctorSlots(String doctorId, DateTime date) async {
     try {
-      // Calculate start and end of the selected day in UTC
       final startOfDay = DateTime(date.year, date.month, date.day, 0, 0, 0);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
@@ -40,8 +28,11 @@ class AppointmentRepository extends GetxService {
     }
   }
 
-  // 3. Book Appointment
-  Future<void> bookAppointment(String doctorId, DateTime startTime, DateTime endTime) async {
+  Future<void> bookAppointment(
+    String doctorId,
+    DateTime startTime,
+    DateTime endTime,
+  ) async {
     try {
       await _apiService.post(
         '/api/appointments/book',
@@ -51,8 +42,21 @@ class AppointmentRepository extends GetxService {
           "endTime": endTime.toUtc().toIso8601String(),
         },
       );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        debugPrint("Error: $e");
+        throw 'This time slot is already booked. Please select a different time.';
+      } else if (e.response?.statusCode == 401) {
+        debugPrint("Error: $e");
+        throw 'You are not logged in.';
+      }
+      else {
+        debugPrint("Error:================================= $e");
+        throw 'Server error: ${e.response?.statusMessage ?? 'Unknown error'}';
+      }
     } catch (e) {
-      throw 'Booking failed: $e';
+        debugPrint("Error: $e");
+      throw 'Connection failed. Please check your internet.';
     }
   }
 }

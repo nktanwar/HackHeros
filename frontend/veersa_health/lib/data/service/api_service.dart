@@ -8,14 +8,14 @@ class ApiService {
   late Dio _dio;
   final _storage = GetStorage();
   
-  final String baseUrl = "http://10.188.189.94:8080"; 
+  final String baseUrl = "https://appointment-backend-latest.onrender.com"; 
 
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
         headers: {'Content-Type': 'application/json'},
       ),
     );

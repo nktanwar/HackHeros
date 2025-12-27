@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:veersa_health/data/repository/authentication_repository.dart';
-import 'package:veersa_health/features/authentication/screens/password_recovery/password_success_screen.dart';
+import 'package:veersa_health/features/authentication/screens/login/login_screen.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
 import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
@@ -46,7 +46,9 @@ class NewPasswordController extends GetxController {
 
       CustomFullScreenLoader.closeLoadingDialog();
 
-      Get.offAll(() => const PasswordSuccessScreen());
+      // Get.offAll(() => const PasswordSuccessScreen());
+      CustomLoaders.successSnackBar(title: "Password Updated Successfully", message: "Your password has been changed. You can now log in with your new password.");
+      Get.offAll(() => const LoginScreen());
     } catch (e) {
       debugPrint("Error =============================== $e");
       CustomFullScreenLoader.closeLoadingDialog();

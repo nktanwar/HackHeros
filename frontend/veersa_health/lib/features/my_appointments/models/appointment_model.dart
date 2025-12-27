@@ -3,41 +3,48 @@ import 'package:veersa_health/utils/constants/image_string_constants.dart';
 enum AppointmentStatus { BOOKED, COMPLETED, CANCELLED }
 
 class AppointmentModel {
-  final String id;
+  final String appointmentId;
   final String doctorId;
-  final String patientId;
+  final String? patientId;
   final DateTime startTime;
   final DateTime endTime;
   final AppointmentStatus status;
-
   final String doctorName;
-  final String clinicName;
-  final String address;
   final String doctorImage;
   final String specialty;
+  final String clinicName;
+  final String mapUrl;
+  final double distanceInKm;
 
   AppointmentModel({
-    required this.id,
+    required this.appointmentId,
     required this.doctorId,
-    required this.patientId,
+    this.patientId,
     required this.startTime,
     required this.endTime,
     required this.status,
-    this.doctorName = "Dr. Veersa Specialist",
-    this.clinicName = "Veersa Health Clinic",
-    this.address = "123 Health St, Panipat",
+    required this.doctorName,
+    required this.specialty,
+    required this.clinicName,
+    required this.mapUrl,
+    this.distanceInKm = 0.0,
     this.doctorImage = ImageStringsConstants.avatar3,
-    this.specialty = "General Physician",
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
     return AppointmentModel(
-      id: json['id'] ?? '',
+      appointmentId: json['appointmentId'] ?? '',
       doctorId: json['doctorId'] ?? '',
-      patientId: json['patientId'] ?? '',
+      patientId: json['patientId'],
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       status: _parseStatus(json['status']),
+      doctorName: json['doctorName'] ?? 'Unknown Doctor',
+      specialty: json['specialty'] ?? 'General',
+      clinicName: json['clinicName'] ?? 'Unknown Clinic',
+      mapUrl: json['mapUrl'] ?? '',
+
+      distanceInKm: (json['distanceInKm'] ?? 0).toDouble(),
     );
   }
 
