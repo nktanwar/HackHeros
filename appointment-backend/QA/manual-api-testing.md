@@ -262,6 +262,67 @@ User registered successfully
 
 ![signup_test.png](screenshots/signup_test.png)
 
+
+---
+
+## Test Case 6: User Login (JWT Authentication)
+
+| Field | Description |
+|------|------------|
+| **API** | `POST /api/auth/login` |
+| **User Role** | PATIENT |
+| **Authentication** | Not Required |
+| **Input** | Valid email and password |
+| **Expected Result** | JWT access token issued |
+| **Actual Result** | JWT token received |
+| **Status** | ✅ Passed |
+
+---
+
+### Request Details
+
+**Endpoint**
+
+
+
+**Request Body**
+```json
+{
+  "email": "pankajrana@duck.com",
+  "password": "NewPassword@123"
+}
+```
+
+***Response Validation***
+---
+HTTP Status Code: 200 OK
+
+JWT access token returned successfully
+
+Token metadata includes:
+
+accessToken
+
+tokenType
+
+expiresIn
+
+---
+
+***Sample Response***
+```json
+{
+"accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+"tokenType": "Bearer",
+"expiresIn": 360000
+}
+```
+
+### Screenshot Evidence
+
+![login_test.png](screenshots/login_test.png)
+
+
 ## Conclusion
 
 All tested APIs behaved as expected under real-world conditions.  
