@@ -6,7 +6,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import jakarta.annotation.PostConstruct
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.stereotype.Component
+
 
 @EnableConfigurationProperties(JwtProperties::class)
 @SpringBootApplication

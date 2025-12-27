@@ -103,5 +103,10 @@ class AuthController(
         )
     }
 
+    @GetMapping("/health")
+    fun healthCheck(): ResponseEntity<String> {
+        return ResponseEntity.ok("App is running")
+    }
+
 
 }

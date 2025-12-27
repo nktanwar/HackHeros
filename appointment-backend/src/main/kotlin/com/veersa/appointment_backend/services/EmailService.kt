@@ -1,35 +1,73 @@
 package com.veersa.appointment_backend.services
 
-
-
-import jakarta.mail.internet.MimeMessage
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 @Service
 class EmailService(
-    private val mailSender: JavaMailSender
+
+    @Value("\${resend.api.key}")
+    private val resendApiKey: String,
+
+    @Value("\${resend.from.email:onboarding@resend.dev}")
+    private val fromEmail: String
+
 ) {
 
+    private val log = LoggerFactory.getLogger(EmailService::class.java)
+
+    private val httpClient = HttpClient.newHttpClient()
+
+    @Async
     fun sendOtpEmail(to: String, otp: String) {
 
-        val message: MimeMessage = mailSender.createMimeMessage()
-        val helper = MimeMessageHelper(message, false)
+        log.info("📧 [RESEND] Preparing OTP email for {}", to)
 
-        helper.setFrom("yourgmail@gmail.com")
-        helper.setTo(to)
-        helper.setSubject("Your OTP Code")
-        helper.setText(
-            """
-            Your OTP is: $otp
+        val body = """
+            {
+              "from": "$fromEmail",
+              "to": ["$to"],
+              "subject": "Your OTP Code",
+              "html": "<p>Your OTP is <b>$otp</b><br/>Valid for 2 minutes.</p>"
+            }
+        """.trimIndent()
 
-            This code is valid for 2 minutes.
-            Please do not share this code with anyone.
-            """.trimIndent(),
-            false
-        )
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.resend.com/emails"))
+            .header("Authorization", "Bearer $resendApiKey")
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build()
 
-        mailSender.send(message)
+        try {
+            log.info("📤 [RESEND] Sending email request to Resend API")
+
+            val response = httpClient.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            )
+
+            log.info(
+                "📨 [RESEND] Response status={} body={}",
+                response.statusCode(),
+                response.body()
+            )
+
+            if (response.statusCode() !in 200..299) {
+                log.error("❌ [RESEND] Email send failed for {}", to)
+            } else {
+                log.info("✅ [RESEND] OTP email sent successfully to {}", to)
+            }
+
+        } catch (ex: Exception) {
+            log.error("🔥 [RESEND] Exception while sending email to {}", to, ex)
+            throw ex
+        }
     }
 }

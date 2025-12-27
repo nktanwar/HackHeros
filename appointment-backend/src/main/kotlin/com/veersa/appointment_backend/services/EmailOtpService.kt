@@ -3,6 +3,7 @@ package com.veersa.appointment_backend.services
 import com.veersa.appointment_backend.repoistory.EmailOtpRepository
 import com.veersa.appointment_backend.models.EmailOtp
 import com.veersa.appointment_backend.repoistory.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -22,27 +23,33 @@ class EmailOtpService(
     /**
      * Generate & send OTP
      */
+    private val log = LoggerFactory.getLogger(EmailOtpService::class.java)
+
     fun sendOtp(email: String) {
 
-        // 1️⃣ Generate OTP
-        val otp = (100000..999999).random().toString()
+        log.info("🔐 [OTP] Send OTP requested for {}", email)
 
-        // 2️⃣ Hash OTP
+        val otp = (100000..999999).random().toString()
+        log.debug("🔐 [OTP] Generated OTP {} for {}", otp, email)
+
         val otpHash = passwordEncoder.encode(otp)
 
-        // 3️⃣ Save OTP (TTL handled by Mongo index)
-        val emailOtp = EmailOtp(
-            email = email,
-            otpHash = otpHash,
-            expiresAt = Instant.now(),
-            used = false
+        emailOtpRepository.save(
+            EmailOtp(
+                email = email,
+                otpHash = otpHash,
+                expiresAt = Instant.now(),
+                used = false
+            )
         )
 
-        emailOtpRepository.save(emailOtp)
+        log.info("🗄️ [OTP] OTP saved in database for {}", email)
 
-        // 4️⃣ Send OTP via email
         emailService.sendOtpEmail(email, otp)
+
+        log.info("📤 [OTP] OTP email send triggered for {}", email)
     }
+
 
     /**
      * Verify OTP
