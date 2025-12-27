@@ -6,8 +6,8 @@ class SlotModel {
 
   factory SlotModel.fromJson(Map<String, dynamic> json) {
     return SlotModel(
-      startTime: DateTime.parse(json['startTime']),
-      endTime: DateTime.parse(json['endTime']),
+      startTime: DateTime.parse(json['startTime']).toLocal(),
+      endTime: DateTime.parse(json['endTime']).toLocal(),
     );
   }
 }

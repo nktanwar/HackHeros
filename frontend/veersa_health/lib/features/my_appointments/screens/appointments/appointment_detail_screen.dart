@@ -221,9 +221,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                       height: 120,
                       width: double.infinity,
                       color: Colors.grey.shade200,
-                      child: const Center(
-                        child: Icon(Icons.map, size: 40, color: Colors.grey),
-                      ),
+                      child: Image.asset("assets/images/map/map_placeholder.png", fit: BoxFit.cover),
                     ),
                   ),
                   const SizedBox(height: 20),

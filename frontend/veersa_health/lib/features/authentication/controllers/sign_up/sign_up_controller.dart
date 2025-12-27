@@ -5,22 +5,20 @@ import 'package:veersa_health/data/repository/authentication_repository.dart';
 import 'package:veersa_health/features/authentication/models/auth_model.dart';
 import 'package:veersa_health/features/authentication/screens/sign_up/verify_email_screen.dart';
 import 'package:veersa_health/utils/helpers/network_manager.dart';
-import 'package:veersa_health/utils/loaders/loaders.dart'; 
-import 'package:veersa_health/utils/loaders/full_screen_loader.dart'; 
+import 'package:veersa_health/utils/loaders/loaders.dart';
+import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
 class SignUpController extends GetxController {
   static SignUpController get instance => Get.find();
 
-  
   final formKey = GlobalKey<FormState>();
   final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final mobileNumberController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  
-  
+
   final privacyPolicy = false.obs;
   final showPassword = false.obs;
   final showConfirmPassword = false.obs;
@@ -28,7 +26,7 @@ class SignUpController extends GetxController {
   void togglePasswordVisibility() {
     showPassword.value = !showPassword.value;
   }
-  
+
   void toggleConfirmPasswordVisibility() {
     showConfirmPassword.value = !showConfirmPassword.value;
   }
@@ -50,13 +48,14 @@ class SignUpController extends GetxController {
         throw 'Location permissions are denied';
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       throw 'Location permissions are permanently denied, we cannot request permissions.';
     }
 
     return await Geolocator.getCurrentPosition();
   }
+
   void signup() async {
     try {
       if (!formKey.currentState!.validate()) return;
@@ -73,7 +72,7 @@ class SignUpController extends GetxController {
 
       CustomFullScreenLoader.openLoadingDialog(
         "Getting locatoin & processing your information...",
-        ImageStringsConstants.loadingImage, 
+        ImageStringsConstants.loadingImage,
       );
       Position position = await _determinePosition();
       final newUser = SignupRequest(
@@ -90,16 +89,20 @@ class SignUpController extends GetxController {
       await _authRepo.sendEmailOtp(newUser.email);
       CustomFullScreenLoader.closeLoadingDialog();
       CustomLoaders.successSnackBar(
-          title: "Success", 
-          message: "OTP sent to ${newUser.email} for verification of email."
+        title: "Success",
+        message: "OTP sent to ${newUser.email} for verification of email.",
       );
       Get.to(
-        () => const VerifyEmailScreen(), 
-        arguments: emailController.text.trim() 
+        () => const VerifyEmailScreen(),
+        arguments: emailController.text.trim(),
       );
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
-      CustomLoaders.errorSnackBar(title: "Something went wrong!", message: "Account not created, email already exists.");
+      debugPrint("Error=======================================\n$e");
+      CustomLoaders.errorSnackBar(
+        title: "Something went wrong!",
+        message: e,
+      );
     }
   }
 

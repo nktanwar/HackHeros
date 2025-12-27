@@ -31,7 +31,7 @@ class UpcomingScheduleList extends StatelessWidget {
           child: const Center(
             child: Text(
               "No upcoming appointments",
-              style: TextStyle(color: ColorConstants.backgroundColor),
+              style: TextStyle(color: ColorConstants.backgroundColor,fontSize: 16,fontWeight: FontWeight.w600),
             ),
           ),
         );

@@ -19,9 +19,8 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
-    // using Get.put here is fine now, because we delete it in dispose()
-    final controller = Get.put(LoginController()); 
-    
+    final controller = Get.put(LoginController());
+
     return Form(
       key: controller.formKey,
       child: Container(
@@ -57,7 +56,6 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            //Remember Me and Forget Password button
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -75,21 +73,20 @@ class _LoginFormState extends State<LoginForm> {
                       Text(
                         "Remember Me",
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: ColorConstants.primaryTextColor,
-                            ),
+                          fontWeight: FontWeight.w500,
+                          color: ColorConstants.primaryTextColor,
+                        ),
                       ),
                     ],
                   ),
                   TextButton(
-                    onPressed: () =>
-                        Get.to(() => const ForgetPasswordScreen()),
+                    onPressed: () => Get.to(() => const ForgetPasswordScreen()),
                     child: Text(
                       "Forget Password?",
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: ColorConstants.primaryBrandColor,
-                          ),
+                        fontWeight: FontWeight.w500,
+                        color: ColorConstants.primaryBrandColor,
+                      ),
                     ),
                   ),
                 ],
@@ -97,7 +94,6 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: SizeConstants.spaceBtwSections),
 
-            //Sign In button
             CustomElevatedButton(
               onPressed: () => controller.signIn(),
               child: const Text("LOGIN"),
@@ -107,10 +103,10 @@ class _LoginFormState extends State<LoginForm> {
       ),
     );
   }
-  
+
   @override
   void dispose() {
-    Get.delete<LoginController>(); 
+    Get.delete<LoginController>();
     super.dispose();
   }
 }

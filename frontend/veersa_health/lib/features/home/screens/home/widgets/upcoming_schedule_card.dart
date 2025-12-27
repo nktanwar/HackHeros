@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class UpcomingScheduleCard extends StatelessWidget {
   final String doctorName;
@@ -24,7 +25,6 @@ class UpcomingScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color tealBackground = Color(0xFF22677A);
-    const Color darkTealFooter = Color(0xFF1B5566);
 
     return GestureDetector(
       onTap: onCardTap,
@@ -114,7 +114,7 @@ class UpcomingScheduleCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: const BoxDecoration(
-                color: darkTealFooter,
+                color: ColorConstants.primaryBrandColor,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),

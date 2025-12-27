@@ -47,48 +47,58 @@ class AppointmentController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          CustomLoaders.warningSnackBar(
-            title: "Permission Denied",
-            message: "Location required to sort appointments.",
-          );
+          _loadAppointments(0.0, 0.0);
           isLoading.value = false;
           return;
         }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        CustomLoaders.warningSnackBar(
+          title: "Permission Required",
+          message: "Enable location in settings to see distance.",
+        );
+        _loadAppointments(0.0, 0.0);
+        isLoading.value = false;
+        return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      final allAppointments = await _homeRepo.getMyAppointments(
-        position.latitude,
-        position.longitude,
-      );
-
-      final now = DateTime.now();
-
-      upcomingAppointments.value = allAppointments.where((appt) {
-        return appt.startTime.isAfter(now) &&
-            appt.status != AppointmentStatus.CANCELLED &&
-            appt.status != AppointmentStatus.COMPLETED;
-      }).toList();
-
-      upcomingAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
-
-      previousAppointments.value = allAppointments.where((appt) {
-        final isPast = appt.startTime.isBefore(now);
-        final isCompletedOrCancelled =
-            appt.status == AppointmentStatus.COMPLETED ||
-            appt.status == AppointmentStatus.CANCELLED;
-        return isPast || isCompletedOrCancelled;
-      }).toList();
-
-      previousAppointments.sort((a, b) => b.startTime.compareTo(a.startTime));
+      await _loadAppointments(position.latitude, position.longitude);
     } catch (e) {
       CustomLoaders.errorSnackBar(title: 'Error', message: e.toString());
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> _loadAppointments(double lat, double lng) async {
+    final allAppointments = await _homeRepo.getMyAppointments(lat, lng);
+    final now = DateTime.now();
+
+    upcomingAppointments.value = allAppointments.where((appt) {
+      final isFutureStart = appt.startTime.isAfter(now);
+      final isActiveStatus =
+          appt.status != AppointmentStatus.CANCELLED &&
+          appt.status != AppointmentStatus.COMPLETED;
+      return isFutureStart && isActiveStatus;
+    }).toList();
+
+    upcomingAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    previousAppointments.value = allAppointments.where((appt) {
+      final isStarted = appt.startTime.isBefore(now);
+      final isCompletedOrCancelled =
+          appt.status == AppointmentStatus.COMPLETED ||
+          appt.status == AppointmentStatus.CANCELLED;
+
+      return isStarted || isCompletedOrCancelled;
+    }).toList();
+
+    previousAppointments.sort((a, b) => b.startTime.compareTo(a.startTime));
   }
 
   Future<void> launchMapUrl(String url) async {

@@ -124,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: () => controller.logout(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Colors.red),
+                      side: const BorderSide(color: Colors.grey),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -132,7 +132,7 @@ class ProfileScreen extends StatelessWidget {
                     child: const Text(
                       "Logout",
                       style: TextStyle(
-                        color: Colors.red,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

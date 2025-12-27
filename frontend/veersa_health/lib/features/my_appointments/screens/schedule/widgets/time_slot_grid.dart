@@ -48,7 +48,7 @@ class TimeSlotGrid extends StatelessWidget {
           final slot = controller.availableSlots[index];
           final timeText = DateFormat(
             'hh:mm a',
-          ).format(slot.startTime.toLocal());
+          ).format(slot.startTime);
 
           bool isTimePassed = false;
           if (isToday) {

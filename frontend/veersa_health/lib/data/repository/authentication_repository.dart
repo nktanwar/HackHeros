@@ -69,6 +69,9 @@ class AuthenticationRepository extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("=======responseCode:${response.statusCode} ");
         return;
+      }
+      if (response.statusCode == 409) {
+        throw "Registration failed: Email Already Exists.";
       } else {
         debugPrint("=======responseCode:${response.statusCode} ");
         throw "Registration failed: ${response.data['message'] ?? 'Unknown error'}";
@@ -112,21 +115,19 @@ class AuthenticationRepository extends GetxController {
       throw e.toString();
     }
   }
-Future<void> registerFCMToken() async {
-    try { 
+
+  Future<void> registerFCMToken() async {
+    try {
       String? token = await _notificationService.getDeviceToken();
 
       if (token != null) {
-        await _apiService.post(
-          '/api/devices/register',
-          data: {"token": token},
-        );
+        await _apiService.post('/api/devices/register', data: {"token": token});
         debugPrint("FCM Token Registered with Backend: $token");
       }
     } catch (e) {
       debugPrint("Failed to register FCM token: $e");
     }
-}
+  }
 
   Future<void> logout() async {
     await deviceStorage.remove('ACCESS_TOKEN');

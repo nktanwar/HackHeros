@@ -62,7 +62,7 @@ class AddressCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade300),
             image: const DecorationImage(
-              image: NetworkImage("assets/images/map/map_placeholder.png"), // Placeholder map image
+              image: NetworkImage("assets/images/map/map_placeholder.png"),
               fit: BoxFit.cover,
             ),
           ),

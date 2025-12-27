@@ -4,7 +4,6 @@ import 'package:veersa_health/common/loaders/shimmer_effect.dart';
 import 'package:veersa_health/features/home/controllers/home_controller.dart';
 import 'package:veersa_health/features/home/screens/home/widgets/doctors_card.dart';
 import 'package:veersa_health/features/my_appointments/screens/schedule/doctor_detail_screen.dart';
-import 'package:veersa_health/features/my_appointments/screens/schedule/schedule_appointment_screen.dart';
 
 class NearbyDoctorsList extends StatelessWidget {
   const NearbyDoctorsList({super.key});
@@ -52,15 +51,6 @@ class NearbyDoctorsList extends StatelessWidget {
                 imageUrl: doctor.image,
                 distance: "${doctor.distanceInKm.toStringAsFixed(1)} km",
                 onScheduleTap: () {
-                  Get.to(
-                    () => const ScheduleAppointmentScreen(),
-                    arguments: {
-                      'doctorId': doctor.doctorId,
-                      'clinicName': doctor.clinicName,
-                    },
-                  );
-                },
-                onCardTap: () {
                   Get.to(() => const DoctorDetailScreen(), arguments: doctor);
                 },
               ),

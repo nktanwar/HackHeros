@@ -9,7 +9,6 @@ class DoctorCard extends StatelessWidget {
   final String distance;
 
   final VoidCallback onScheduleTap;
-  final VoidCallback onCardTap;
 
   const DoctorCard({
     super.key,
@@ -18,7 +17,6 @@ class DoctorCard extends StatelessWidget {
     required this.imageUrl,
     required this.distance,
     required this.onScheduleTap,
-    required this.onCardTap,
   });
 
   @override
@@ -41,107 +39,103 @@ class DoctorCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20.0),
-        child: InkWell(
-          onTap: onCardTap,
-          borderRadius: BorderRadius.circular(20.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage(imageUrl),
-                      child: (imageUrl.isEmpty)
-                          ? const Icon(Icons.local_hospital)
-                          : null,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            clinicName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage(imageUrl),
+                    child: (imageUrl.isEmpty)
+                        ? const Icon(Icons.local_hospital)
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          clinicName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            doctorSpeciality,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                            ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          doctorSpeciality,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
                           ),
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 4.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: ColorConstants.primaryBrandColor
-                                  .withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Iconsax.location,
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 4.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ColorConstants.primaryBrandColor
+                                .withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Iconsax.location,
+                                color: ColorConstants.primaryBrandColor,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                distance,
+                                style: TextStyle(
                                   color: ColorConstants.primaryBrandColor,
-                                  size: 14,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  distance,
-                                  style: TextStyle(
-                                    color: ColorConstants.primaryBrandColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: onScheduleTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorConstants.primaryBrandColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: onScheduleTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorConstants.primaryBrandColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: const Text(
-                      'Schedule Appointment',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text(
+                    'Schedule Appointment',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

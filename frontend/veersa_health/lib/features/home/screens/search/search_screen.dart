@@ -6,7 +6,6 @@ import 'package:veersa_health/features/home/screens/home/widgets/doctors_card.da
 import 'package:veersa_health/features/home/screens/search/widgets/search_bottom_sheet.dart';
 import 'package:veersa_health/features/home/screens/search/widgets/search_field_with_filter.dart';
 import 'package:veersa_health/features/my_appointments/screens/schedule/doctor_detail_screen.dart';
-import 'package:veersa_health/features/my_appointments/screens/schedule/schedule_appointment_screen.dart';
 import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/image_string_constants.dart';
 
@@ -186,17 +185,7 @@ class SearchScreen extends StatelessWidget {
           doctorSpeciality: doc.specialty,
           imageUrl: doc.image,
           distance: "${doc.distanceInKm.toStringAsFixed(1)} km away",
-
           onScheduleTap: () {
-            Get.to(
-              () => const ScheduleAppointmentScreen(),
-              arguments: {
-                'doctorId': doc.doctorId,
-                'clinicName': doc.clinicName,
-              },
-            );
-          },
-          onCardTap: () {
             Get.to(() => const DoctorDetailScreen(), arguments: doc);
           },
         );

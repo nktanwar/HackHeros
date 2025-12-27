@@ -36,7 +36,6 @@ class SignupRequest {
   final String phoneNumber;
   final String password;
   final String role; 
-  final String? specialty; 
   final double latitude;
   final double longitude;
 
@@ -46,7 +45,6 @@ class SignupRequest {
     required this.phoneNumber,
     required this.password,
     this.role = "PATIENT",
-    this.specialty,
     required this.latitude,
     required this.longitude,
   });
@@ -57,7 +55,6 @@ class SignupRequest {
     "phoneNumber": phoneNumber,
     "password": password,
     "role": role,
-    "specialty": specialty,
     "latitude": latitude,
     "longitude": longitude,
   };

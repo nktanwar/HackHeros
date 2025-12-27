@@ -7,13 +7,13 @@ import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class HomeAppBar extends StatelessWidget {
   final HomeController controller;
-  final VoidCallback onNotificationTap;
+  final VoidCallback onAppointmentTap;
   final VoidCallback onProfileTap;
 
   const HomeAppBar({
     super.key,
     required this.controller,
-    required this.onNotificationTap,
+    required this.onAppointmentTap,
     required this.onProfileTap,
   });
 
@@ -107,9 +107,9 @@ class HomeAppBar extends StatelessWidget {
                 ],
               ),
               child: IconButton(
-                onPressed: onNotificationTap,
+                onPressed: onAppointmentTap,
                 icon: const Icon(
-                  Iconsax.notification_bing,
+                  Iconsax.calendar_tick,
                   color: Colors.black,
                 ),
               ),
