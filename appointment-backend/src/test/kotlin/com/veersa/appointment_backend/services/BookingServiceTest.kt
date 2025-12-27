@@ -174,4 +174,73 @@ class BookingServiceTest {
     }
 
 
+    @Test
+    fun `should reject booking when endTime is before or equal to startTime`() {
+
+        val patientId = "patient-1"
+
+        val start = Instant.parse("2025-01-01T10:30:00Z")
+        val end   = Instant.parse("2025-01-01T10:00:00Z") // ❌ invalid
+
+        val request = BookAppointmentRequest(
+            doctorId = "doctor-1",
+            startTime = start,
+            endTime = end
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            bookingService.bookAppointment(patientId, request)
+        }
+    }
+
+
+    @Test
+    fun `should handle race condition when slot is booked concurrently`() {
+
+        val doctorId = "doctor-1"
+        val patientId = "patient-1"
+
+        val start = Instant.parse("2025-01-01T14:00:00Z")
+        val end   = Instant.parse("2025-01-01T14:30:00Z")
+
+        val request = BookAppointmentRequest(
+            doctorId = doctorId,
+            startTime = start,
+            endTime = end
+        )
+
+        // No conflicts detected initially
+        Mockito.`when`(
+            appointmentRepository
+                .existsByDoctorIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                    doctorId,
+                    AppointmentStatus.BOOKED,
+                    end,
+                    start
+                )
+        ).thenReturn(false)
+
+        Mockito.`when`(
+            appointmentRepository
+                .existsByPatientIdAndStatusAndStartTimeLessThanAndEndTimeGreaterThan(
+                    patientId,
+                    AppointmentStatus.BOOKED,
+                    end,
+                    start
+                )
+        ).thenReturn(false)
+
+        // Simulate DB-level race condition
+        Mockito.`when`(
+            appointmentRepository.save(Mockito.any())
+        ).thenThrow(org.springframework.dao.DuplicateKeyException("Duplicate booking"))
+
+        assertThrows(SlotAlreadyBookedException::class.java) {
+            bookingService.bookAppointment(patientId, request)
+        }
+    }
+
+
+
+
 }
