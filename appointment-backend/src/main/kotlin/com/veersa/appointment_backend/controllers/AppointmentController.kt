@@ -11,13 +11,11 @@ import jakarta.validation.Valid
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import com.veersa.appointment_backend.repoistory.AppointmentRepository
 
 @RestController
 @RequestMapping("/api/appointments")
 class AppointmentController(
-    private val bookingService: BookingService,
-    private val appointmentService: BookingService
+    private val bookingService: BookingService
 ) {
 
     @PreAuthorize("hasRole('PATIENT')")
@@ -40,13 +38,12 @@ class AppointmentController(
         @RequestParam(required = false) longitude: Double?
     ): List<AppointmentViewResponse> {
 
-        return appointmentService.getMyAppointments(
+        return bookingService.getMyAppointments(
             user = user,
             latitude = latitude,
             longitude = longitude
         )
     }
-
 }
 
 
