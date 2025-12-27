@@ -15,23 +15,18 @@ class BookingSuccessScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
-            
             physics: const AlwaysScrollableScrollPhysics(),
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
-                
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    
                     Column(
                       children: [
-                        const SizedBox(height: 80), 
+                        const SizedBox(height: 80),
                         Image.asset(
                           ImageStringsConstants.bookingSuccess,
                           height: 250,
@@ -61,14 +56,13 @@ class BookingSuccessScreen extends StatelessWidget {
                       ],
                     ),
 
-                    
                     Column(
                       children: [
                         CustomElevatedButton(
                           onPressed: () => Get.offAll(() => const HomeScreen()),
                           child: const Text("Done"),
                         ),
-                        const SizedBox(height: 20), 
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ],

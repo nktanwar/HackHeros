@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum NotificationType {
   APPOINTMENT_CONFIRMATION,
   APPOINTMENT_REMINDER,
@@ -11,8 +13,8 @@ class NotificationModel {
   final NotificationType type;
   final DateTime scheduledAt;
   final bool sent;
-  final String? mapUrl;
-
+  
+  String? mapUrl;
   NotificationModel({
     required this.id,
     required this.appointmentId,
@@ -23,18 +25,6 @@ class NotificationModel {
     this.mapUrl,
   });
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
-    return NotificationModel(
-      id: json['id'] ?? '',
-      appointmentId: json['appointmentId'] ?? '',
-      userId: json['userId'] ?? '',
-      type: _parseType(json['type']),
-      scheduledAt: DateTime.parse(json['scheduledAt']),
-      sent: json['sent'] ?? false,
-      mapUrl: json['mapUrl'],
-    );
-  }
-
   static NotificationType _parseType(String? type) {
     switch (type) {
       case 'APPOINTMENT_CONFIRMATION':
@@ -44,5 +34,32 @@ class NotificationModel {
       default:
         return NotificationType.GENERAL;
     }
+  }
+
+factory NotificationModel.fromJson(Map<String, dynamic> json) {
+  String? findMapUrl(Map<String, dynamic> json) {
+    if (json['mapUrl'] != null && json['mapUrl'].toString().isNotEmpty) {
+      return json['mapUrl'];
+    }
+    if (json['data'] != null && json['data'] is Map) {
+      final data = json['data'];
+      if (data['mapUrl'] != null) return data['mapUrl'];
+    }
+    return null;
+  }
+
+    debugPrint("RAW JSON for Notification ${json['id']}: $json");
+
+  return NotificationModel(
+    id: json['id']?.toString() ?? '',
+    appointmentId: json['appointmentId']?.toString() ?? '',
+    userId: json['userId']?.toString() ?? '',
+    type: _parseType(json['type']),
+    scheduledAt: json['scheduledAt'] != null 
+          ? DateTime.parse(json['scheduledAt']) 
+          : DateTime.now(),
+    sent: json['sent'] ?? false,
+    mapUrl: findMapUrl(json), 
+  );
   }
 }

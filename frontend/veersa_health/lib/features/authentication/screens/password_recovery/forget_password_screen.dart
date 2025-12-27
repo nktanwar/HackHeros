@@ -23,7 +23,7 @@ class ForgetPasswordScreen extends StatelessWidget {
           style: IconButton.styleFrom(
             backgroundColor: ColorConstants.grey
           ),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Iconsax.arrow_left,weight:600, color: Colors.black),
         ),
       ),

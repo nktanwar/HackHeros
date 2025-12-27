@@ -10,7 +10,6 @@ class ScheduleAppointmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize Controller
     final controller = Get.put(AppointmentController());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = Get.arguments;
@@ -20,7 +19,7 @@ class ScheduleAppointmentScreen extends StatelessWidget {
     });
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Book Appointment"),
+        title: const Text("Book Appointment",style: TextStyle(fontFamily: "Montserrat")),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -39,26 +38,29 @@ class ScheduleAppointmentScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- 1. Date Selection Section ---
                     const Text(
                       "Select Date",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    
-                    // Standard Date Picker Display
+
                     InkWell(
                       onTap: () async {
                         final DateTime? picked = await showDatePicker(
                           context: context,
                           initialDate: controller.selectedDate.value,
                           firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(const Duration(days: 30)),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 30),
+                          ),
                           builder: (context, child) {
                             return Theme(
                               data: Theme.of(context).copyWith(
                                 colorScheme: const ColorScheme.light(
-                                  primary: Color(0xFF258099), // Brand color
+                                  primary: Color(0xFF258099),
                                 ),
                               ),
                               child: child!,
@@ -70,7 +72,10 @@ class ScheduleAppointmentScreen extends StatelessWidget {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade400),
                           borderRadius: BorderRadius.circular(12),
@@ -79,11 +84,21 @@ class ScheduleAppointmentScreen extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Obx(() => Text(
-                              DateFormat('EEEE, d MMMM yyyy').format(controller.selectedDate.value),
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                            )),
-                            const Icon(Icons.calendar_month, color: Color(0xFF258099)),
+                            Obx(
+                              () => Text(
+                                DateFormat(
+                                  'EEEE, d MMMM yyyy',
+                                ).format(controller.selectedDate.value),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.calendar_month,
+                              color: Color(0xFF258099),
+                            ),
                           ],
                         ),
                       ),
@@ -91,13 +106,15 @@ class ScheduleAppointmentScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // --- 2. Time Slots Section ---
                     const Text(
                       "Available Time Slots",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     const TimeSlotGrid(),
                     const SizedBox(height: 24),
                   ],
@@ -105,7 +122,6 @@ class ScheduleAppointmentScreen extends StatelessWidget {
               ),
             ),
 
-            // --- 3. Bottom Button ---
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: CustomElevatedButton(

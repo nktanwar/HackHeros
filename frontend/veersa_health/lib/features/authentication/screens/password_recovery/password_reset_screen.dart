@@ -88,13 +88,7 @@ class PasswordResetScreen extends StatelessWidget {
                         hintText: "Re-enter your password",
                         prefixIcon: Iconsax.password_check,
                         obscureText: controller.hideConfirmPassword.value,
-                        // Validate both format AND match
-                        validator: (value) {
-                          if (value != controller.passwordController.text) {
-                            return "Passwords do not match";
-                          }
-                          return Validators.validatePassword(value);
-                        },
+                        validator: Validators.validatePassword,
                         suffixIcon: IconButton(
                           onPressed: () =>
                               controller.hideConfirmPassword.value =

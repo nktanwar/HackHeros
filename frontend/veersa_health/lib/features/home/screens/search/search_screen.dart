@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:veersa_health/common/loaders/shimmer_effect.dart';
 import 'package:veersa_health/features/home/controllers/search_logic_controller.dart';
 import 'package:veersa_health/features/home/screens/home/widgets/doctors_card.dart';
 import 'package:veersa_health/features/home/screens/search/widgets/search_bottom_sheet.dart';
@@ -14,26 +15,12 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Inject the Hybrid Controller
     final controller = Get.put(SearchLogicController());
 
-    // Handle arguments passed from Home Screen (e.g., View All Specialities)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Reset filters when entering fresh
-      // Note: If you want to keep state when going back/forth, remove clearAllFilters()
-      // controller.clearAllFilters(); 
-
       final args = Get.arguments;
-      if (args != null) {
-        if (args['openFilter'] == true) {
-          _showFilterSheet(context);
-        }
-        if (args['speciality'] != null) {
-          controller.setSpeciality(args['speciality']);
-        }
-        if (args['sortBy'] == 'distance') {
-          controller.setSortOption(SortOption.nearest);
-        }
+      if (args != null && args['openFilter'] == true) {
+        _showFilterSheet(context);
       }
     });
 
@@ -44,27 +31,50 @@ class SearchScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              // 1. Search Bar
               SearchFieldWithFilter(
                 onFilterTap: () => _showFilterSheet(context),
               ),
               const SizedBox(height: 24),
 
-              // 2. Results Area
               Expanded(
                 child: Obx(() {
-                  // A. Show Loading Spinner
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
+                    return SizedBox(
+                      width: double.infinity,
+                      child: ListView.separated(
+                        itemCount: 6,
+                        scrollDirection: Axis.vertical,
+                        separatorBuilder: (context, index) => const SizedBox(height: 12,),
+                        itemBuilder: (context, index) {
+                          return CustomShimmerEffect(
+                            width: double.infinity,
+                            height: 190,
+                          );
+                        },
+                      ),
+                    );
                   }
 
-                  // B. Show Categories if no search is active
                   if (!controller.showResultsView) {
                     return _buildCategoryGrid(controller);
-                  } 
-                  
-                  // C. Show Filtered Results
-                  else {
+                  } else {
+                    if (controller.isFiltering.value) {
+                      return Center(child: SizedBox(
+                      width: double.infinity,
+                      child: ListView.separated(
+                        itemCount: 6,
+                        scrollDirection: Axis.vertical,
+                        separatorBuilder: (context, index) => const SizedBox(height: 12,),
+                        itemBuilder: (context, index) {
+                          return const CustomShimmerEffect(
+                            width: double.infinity,
+                            height: 190,
+                          );
+                        },
+                      ),
+                    )
+                    );
+                    }
                     return _buildSearchResultsList(controller);
                   }
                 }),
@@ -85,14 +95,13 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // --- Widget: Category Grid (Unchanged) ---
   Widget _buildCategoryGrid(SearchLogicController controller) {
     final categories = ImageStringsConstants.specialities;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Categories",
+          "Doctor's Specialty",
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
@@ -111,15 +120,30 @@ class SearchScreen extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  child: Image.asset(cat['icon']!),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.asset(
+                      cat['icon']!,
+                      fit: BoxFit.cover,
+                      // This prevents the "Unable to load asset" crash
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.local_hospital,
+                          color: ColorConstants.primaryBrandColor,
+                        );
+                      },
+                    ),
+                  ),
                 ),
                 title: Text(
                   cat['name']!,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 tileColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
                 ),
               );
             },
@@ -129,7 +153,6 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // --- Widget: Search Results List (UPDATED) ---
   Widget _buildSearchResultsList(SearchLogicController controller) {
     if (controller.filteredDoctors.isEmpty) {
       return Center(
@@ -142,6 +165,11 @@ class SearchScreen extends StatelessWidget {
               "No doctors found.",
               style: TextStyle(color: Colors.grey.shade600),
             ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: controller.clearAllFilters,
+              child: const Text("Clear Filters"),
+            ),
           ],
         ),
       );
@@ -151,36 +179,25 @@ class SearchScreen extends StatelessWidget {
       itemCount: controller.filteredDoctors.length,
       separatorBuilder: (_, _) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        // Get the specific doctor model
         final doc = controller.filteredDoctors[index];
-        
+
         return DoctorCard(
-          // Mapped 'clinicName' to 'doctorName' parameter if your card expects that
-          // Or update DoctorCard to accept 'clinicName'
-          doctorName: doc.clinicName, 
+          clinicName: doc.clinicName,
           doctorSpeciality: doc.specialty,
-          imageUrl: doc.image, // Uses default placeholder from model
-          
-          // Formatted Distance
+          imageUrl: doc.image,
           distance: "${doc.distanceInKm.toStringAsFixed(1)} km away",
-          
-          // Formatted Fees
-          fees: "Fees: Rs ${doc.fees.toInt()}",
-          
+
           onScheduleTap: () {
             Get.to(
               () => const ScheduleAppointmentScreen(),
               arguments: {
                 'doctorId': doc.doctorId,
                 'clinicName': doc.clinicName,
-              }
+              },
             );
           },
           onCardTap: () {
-            Get.to(
-              () => const DoctorDetailScreen(),
-              arguments: doc // Pass the full model object
-            );
+            Get.to(() => const DoctorDetailScreen(), arguments: doc);
           },
         );
       },

@@ -1,38 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:veersa_health/features/my_appointments/controllers/appointment_controller.dart';
 import 'package:veersa_health/features/my_appointments/models/appointment_model.dart';
+import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class AppointmentDetailScreen extends StatelessWidget {
   const AppointmentDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 1. Retrieve the data passed from the previous screen
     final AppointmentModel appointment = Get.arguments;
+    final controller = AppointmentController.instance;
 
-    // 2. Logic to determine status UI
-    final bool isUpcoming = appointment.status == AppointmentStatus.BOOKED;
-    final Color statusColor = isUpcoming ? const Color(0xFF5E9EA0) : Colors.grey;
-    final String statusText = isUpcoming ? "Upcoming Appointment" : appointment.status.name;
+    final bool isUpcoming = appointment.startTime.isAfter(DateTime.now());
+    final Color statusColor = isUpcoming
+        ? const Color(0xFF5E9EA0)
+        : Colors.grey;
+    final String statusText = isUpcoming
+        ? "Upcoming Appointment"
+        : appointment.status.name;
 
-    // 3. Date Formatting
-    final String formattedDate = DateFormat('EEEE, MMMM d, y').format(appointment.startTime);
-    final String formattedTime = DateFormat('h:mm a').format(appointment.startTime);
+    final String formattedDate = DateFormat(
+      'EEEE, MMMM d, y',
+    ).format(appointment.startTime);
+    final String formattedTime = DateFormat(
+      'h:mm a',
+    ).format(appointment.startTime);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FE), // Light grey-blue background
+      backgroundColor: const Color(0xFFF8F9FE),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Get.back(),
         ),
-        title: const Text("Appointment Details"),
+        title: const Text(
+          "Appointment Details",
+          style: TextStyle(fontFamily: "Montserrat"),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         titleTextStyle: const TextStyle(
-            color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
+          color: Colors.black87,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
@@ -40,7 +54,6 @@ class AppointmentDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- TOP ROW: STATUS & RESCHEDULE ---
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -56,10 +69,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // --- DOCTOR CARD ---
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -71,10 +81,8 @@ class AppointmentDetailScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    // Use 'doctorImage' from the updated model
-                    backgroundImage: NetworkImage(appointment.doctorImage),
+                    backgroundImage: AssetImage(appointment.doctorImage),
                     backgroundColor: Colors.grey.shade200,
-                    onBackgroundImageError: (_,_) {}, // Handle error silently
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -97,21 +105,6 @@ class AppointmentDetailScreen extends StatelessWidget {
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(Icons.call, size: 16, color: Color(0xFF5E9EA0)),
-                            const SizedBox(width: 6),
-                            Text(
-                              "+91 9876543210", // Placeholder (Backend didn't provide phone)
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -120,8 +113,6 @@ class AppointmentDetailScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 24),
-
-            // --- "APPOINTMENT INFO" TITLE ---
             const Text(
               "Appointment Info",
               style: TextStyle(
@@ -130,10 +121,8 @@ class AppointmentDetailScreen extends StatelessWidget {
                 color: Color(0xFF2D3142),
               ),
             ),
-
             const SizedBox(height: 12),
 
-            // --- MAIN INFO CONTAINER ---
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -143,7 +132,6 @@ class AppointmentDetailScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Date Row
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -153,15 +141,18 @@ class AppointmentDetailScreen extends StatelessWidget {
                           color: Colors.blueGrey.shade50,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.calendar_today,
-                            size: 20, color: Colors.blueGrey.shade700),
+                        child: Icon(
+                          Icons.calendar_today,
+                          size: 20,
+                          color: Colors.blueGrey.shade700,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            formattedDate, // Used formatted date
+                            formattedDate,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -170,20 +161,17 @@ class AppointmentDetailScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            formattedTime, // Used formatted time
+                            formattedTime,
                             style: TextStyle(
                               color: Colors.grey.shade500,
                               fontSize: 13,
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Location Row
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -193,8 +181,11 @@ class AppointmentDetailScreen extends StatelessWidget {
                           color: Colors.blueGrey.shade50,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.location_on,
-                            size: 20, color: Colors.blueGrey.shade700),
+                        child: Icon(
+                          Icons.location_on,
+                          size: 20,
+                          color: Colors.blueGrey.shade700,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -211,7 +202,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              appointment.address,
+                              "${appointment.distanceInKm} km",
                               style: TextStyle(
                                 color: Colors.grey.shade500,
                                 fontSize: 13,
@@ -220,68 +211,49 @@ class AppointmentDetailScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Map Image (Placeholder)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: SizedBox(
+                    child: Container(
                       height: 120,
                       width: double.infinity,
-                      child: Image.network(
-                        "https://maps.googleapis.com/maps/api/staticmap?center=Panipat,Haryana&zoom=14&size=600x300&key=YOUR_API_KEY", // Real logic would go here
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, o, s) => Container(
-                          color: Colors.grey.shade200,
-                          child: const Center(
-                              child: Icon(Icons.map, color: Colors.grey, size: 40)),
-                        ),
+                      color: Colors.grey.shade200,
+                      child: const Center(
+                        child: Icon(Icons.map, size: 40, color: Colors.grey),
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Get Directions Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        // Integration: Launch Google Maps
-                      },
+                      onPressed: () =>
+                          controller.launchMapUrl(appointment.mapUrl),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5391B4),
-                        elevation: 0,
+                        backgroundColor: ColorConstants.primaryBrandColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      icon: const Icon(Icons.location_on_outlined, color: Colors.white),
+                      icon: const Icon(
+                        Icons.location_on_outlined,
+                        color: Colors.white,
+                      ),
                       label: const Text(
                         "Get Directions",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Footer Timestamp
-            Center(
-              child: Text(
-                "Booked on ${DateFormat('MMM d, h:mm a').format(DateTime.now())}", // Ideally appointment.createdAt from backend
-                style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
               ),
             ),
           ],

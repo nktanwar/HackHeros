@@ -5,13 +5,12 @@ import 'package:veersa_health/features/my_appointments/screens/appointments/appo
 import 'package:veersa_health/features/my_appointments/screens/appointments/widgets/appointment_card.dart';
 
 class AppointmentScreen extends StatelessWidget {
-  final AppointmentController controller = Get.put(AppointmentController());
-
-  AppointmentScreen({super.key});
+  const AppointmentScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AppointmentController());
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -19,11 +18,13 @@ class AppointmentScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Get.back(),
         ),
-        title: const Text("My Appointments"),
+        title: const Text(
+          "My Appointments",
+          style: TextStyle(fontFamily: "Montserrat"),
+        ),
       ),
       body: Column(
         children: [
-          // --- CUSTOM TAB TOGGLE ---
           Container(
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(4),
@@ -32,37 +33,41 @@ class AppointmentScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey.shade200),
             ),
-            child: Obx(() => Row(
-              children: [
-                _buildTabButton("Upcoming", 0),
-                _buildTabButton("Previous", 1),
-              ],
-            )),
+            child: Obx(
+              () => Row(
+                children: [
+                  _buildTabButton(context, controller, "Upcoming", 0),
+                  _buildTabButton(context, controller, "Previous", 1),
+                ],
+              ),
+            ),
           ),
 
-          // --- APPOINTMENT LIST ---
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              // Decide which list to show
               final appointments = controller.selectedTab.value == 0
                   ? controller.upcomingAppointments
                   : controller.previousAppointments;
 
               if (appointments.isEmpty) {
-              return Center(
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.calendar_today, size: 50, color: Colors.grey),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(height: 10),
                       Text(
-                        controller.selectedTab.value == 0 
-                          ? "No upcoming appointments" 
-                          : "No history found",
+                        controller.selectedTab.value == 0
+                            ? "No upcoming appointments"
+                            : "No history found",
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -76,11 +81,13 @@ class AppointmentScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final appointment = appointments[index];
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppointmentCard(
                         appointment: appointment,
-                        onTap: () => Get.to(() => const AppointmentDetailScreen(), arguments: appointment),
+                        onTap: () => Get.to(
+                          () => const AppointmentDetailScreen(),
+                          arguments: appointment,
+                        ),
                       ),
                       const SizedBox(height: 12),
                     ],
@@ -94,8 +101,12 @@ class AppointmentScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget for the custom tab button
-  Widget _buildTabButton(String text, int index) {
+  Widget _buildTabButton(
+    BuildContext context,
+    AppointmentController controller,
+    String text,
+    int index,
+  ) {
     final isSelected = controller.selectedTab.value == index;
     return Expanded(
       child: GestureDetector(
@@ -105,7 +116,7 @@ class AppointmentScreen extends StatelessWidget {
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF5E9EA0) : Colors.transparent, // Teal-ish blue
+            color: isSelected ? const Color(0xFF5E9EA0) : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -120,4 +131,3 @@ class AppointmentScreen extends StatelessWidget {
     );
   }
 }
-

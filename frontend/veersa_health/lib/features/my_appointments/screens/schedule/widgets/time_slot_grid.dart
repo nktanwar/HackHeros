@@ -21,11 +21,18 @@ class TimeSlotGrid extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(12)
+            borderRadius: BorderRadius.circular(12),
           ),
           child: const Center(child: Text("No slots available for this date.")),
         );
       }
+
+      final now = DateTime.now();
+      final selectedDate = controller.selectedDate.value;
+      final isToday =
+          selectedDate.year == now.year &&
+          selectedDate.month == now.month &&
+          selectedDate.day == now.day;
 
       return GridView.builder(
         shrinkWrap: true,
@@ -39,22 +46,35 @@ class TimeSlotGrid extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           final slot = controller.availableSlots[index];
-          
-          // Logic: Format Backend DateTime to "10:00 AM"
-          final timeText = DateFormat('hh:mm a').format(slot.startTime.toLocal());
-          
+          final timeText = DateFormat(
+            'hh:mm a',
+          ).format(slot.startTime.toLocal());
+
+          bool isTimePassed = false;
+          if (isToday) {
+            if (slot.startTime.isBefore(now)) {
+              isTimePassed = true;
+            }
+          }
+
           return Obx(() {
             final isSelected = controller.selectedSlot.value == slot;
 
             return InkWell(
-              onTap: () => controller.selectSlot(slot),
+              onTap: isTimePassed ? null : () => controller.selectSlot(slot),
               borderRadius: BorderRadius.circular(10),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF258099) : Colors.white,
+                  color: isTimePassed
+                      ? Colors.grey.shade200
+                      : (isSelected ? const Color(0xFF258099) : Colors.white),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF258099) : Colors.grey.shade400,
+                    color: isTimePassed
+                        ? Colors.transparent
+                        : (isSelected
+                              ? const Color(0xFF258099)
+                              : Colors.grey.shade400),
                   ),
                 ),
                 child: Center(
@@ -63,7 +83,13 @@ class TimeSlotGrid extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : Colors.black,
+
+                      color: isTimePassed
+                          ? Colors.grey.shade400
+                          : (isSelected ? Colors.white : Colors.black),
+                      decoration: isTimePassed
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                 ),

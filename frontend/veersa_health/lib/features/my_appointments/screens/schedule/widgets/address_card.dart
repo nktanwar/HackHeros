@@ -4,12 +4,10 @@ import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class AddressCard extends StatelessWidget {
   final String clinicName;
-  final String address;
 
   const AddressCard({
     super.key,
     required this.clinicName,
-    required this.address,
   });
 
   @override
@@ -34,13 +32,7 @@ class AddressCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.only(left: 24.0),
-                  child: Text(
-                    address,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                  ),
-                ),
+                
               ],
             ),
             Container(

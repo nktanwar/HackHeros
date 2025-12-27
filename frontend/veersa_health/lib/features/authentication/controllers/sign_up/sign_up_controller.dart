@@ -99,7 +99,7 @@ class SignUpController extends GetxController {
       );
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
-      CustomLoaders.errorSnackBar(title: "Something went wrong!", message: "Account not created, email already available.");
+      CustomLoaders.errorSnackBar(title: "Something went wrong!", message: "Account not created, email already exists.");
     }
   }
 

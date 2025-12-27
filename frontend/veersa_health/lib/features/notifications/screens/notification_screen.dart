@@ -11,7 +11,9 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NotificationController());
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.markAsRead();
+    });
     return Scaffold(
       backgroundColor: ColorConstants.backgroundColor,
       appBar: AppBar(
@@ -28,6 +30,7 @@ class NotificationScreen extends StatelessWidget {
             color: ColorConstants.primaryTextColor,
             fontWeight: FontWeight.bold,
             fontSize: 18,
+            fontFamily: "Montserrat",
           ),
         ),
       ),
@@ -41,7 +44,11 @@ class NotificationScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.notifications_off_outlined, size: 60, color: Colors.grey.shade400),
+                Icon(
+                  Icons.notifications_off_outlined,
+                  size: 60,
+                  color: Colors.grey.shade400,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   "No notifications yet",
@@ -59,14 +66,25 @@ class NotificationScreen extends StatelessWidget {
             itemCount: controller.notifications.length,
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
-              
+
+              debugPrint(
+                "ID: ${notification.id} | URL: ${notification.mapUrl}",
+              );
+
               return NotificationCard(
                 title: controller.getTitle(notification),
                 description: controller.getDescription(notification),
                 dateTime: controller.formatTime(notification.scheduledAt),
-                isReminder: notification.type == NotificationType.APPOINTMENT_REMINDER,
-                onMapTap: (notification.mapUrl != null && notification.mapUrl!.isNotEmpty)
-                    ? () => controller.launchMap(notification.mapUrl)
+                isReminder:
+                    notification.type == NotificationType.APPOINTMENT_REMINDER,
+
+                onMapTap:
+                    (notification.mapUrl != null &&
+                        notification.mapUrl!.isNotEmpty)
+                    ? () {
+                        debugPrint("Launching map for: ${notification.mapUrl}");
+                        controller.launchMap(notification.mapUrl);
+                      }
                     : null,
               );
             },
@@ -76,3 +94,4 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 }
+

@@ -9,12 +9,19 @@ import 'package:veersa_health/utils/constants/color_constants.dart';
 import 'package:veersa_health/utils/constants/size_constants.dart';
 import 'package:veersa_health/utils/validators/validators.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(LoginController());
+    // using Get.put here is fine now, because we delete it in dispose()
+    final controller = Get.put(LoginController()); 
+    
     return Form(
       key: controller.formKey,
       child: Container(
@@ -39,11 +46,9 @@ class LoginForm extends StatelessWidget {
                 suffixIcon: InkWell(
                   onTap: controller.togglePasswordVisibility,
                   child: controller.showPassword.value
-                      ? Icon(Iconsax.eye)
-                      : Icon(Iconsax.eye_slash),
-                  
+                      ? const Icon(Iconsax.eye)
+                      : const Icon(Iconsax.eye_slash),
                 ),
-
                 hintText: "Enter your password",
                 prefixIcon: Iconsax.password_check,
                 obscureText: !controller.showPassword.value,
@@ -51,8 +56,8 @@ class LoginForm extends StatelessWidget {
                 validator: Validators.validatePassword,
               ),
             ),
-            
-            //Remember Me and Forget Passoword button
+
+            //Remember Me and Forget Password button
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -61,8 +66,7 @@ class LoginForm extends StatelessWidget {
                   Row(
                     children: [
                       Obx(
-                        () => 
-                        Checkbox(
+                        () => Checkbox(
                           value: controller.rememberMe.value,
                           onChanged: (value) =>
                               controller.rememberMe.value = value!,
@@ -71,36 +75,42 @@ class LoginForm extends StatelessWidget {
                       Text(
                         "Remember Me",
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: ColorConstants.primaryTextColor,
-                        ),
+                              fontWeight: FontWeight.w500,
+                              color: ColorConstants.primaryTextColor,
+                            ),
                       ),
                     ],
                   ),
                   TextButton(
-                    onPressed:
-                     () => Get.to(() => const ForgetPasswordScreen()),
+                    onPressed: () =>
+                        Get.to(() => const ForgetPasswordScreen()),
                     child: Text(
                       "Forget Password?",
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color:  ColorConstants.primaryBrandColor,
-                      ),
+                            fontWeight: FontWeight.w500,
+                            color: ColorConstants.primaryBrandColor,
+                          ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: SizeConstants.spaceBtwSections,),
-            
+            const SizedBox(height: SizeConstants.spaceBtwSections),
+
             //Sign In button
             CustomElevatedButton(
-              onPressed: ()=>controller.signIn(),
+              onPressed: () => controller.signIn(),
               child: const Text("LOGIN"),
             ),
           ],
         ),
       ),
     );
+  }
+  
+  @override
+  void dispose() {
+    Get.delete<LoginController>(); 
+    super.dispose();
   }
 }

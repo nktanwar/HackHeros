@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:veersa_health/data/repository/authentication_repository.dart';
-import 'package:veersa_health/features/authentication/screens/sign_up/sign_up_success.dart';
+import 'package:veersa_health/features/authentication/screens/login/login_screen.dart';
 import 'package:veersa_health/utils/helpers/network_manager.dart';
 import 'package:veersa_health/utils/loaders/loaders.dart';
 import 'package:veersa_health/utils/loaders/full_screen_loader.dart';
@@ -74,7 +74,12 @@ class VerifyEmailController extends GetxController {
 
       CustomFullScreenLoader.closeLoadingDialog();
 
-      Get.off(() => const SignUpSuccessScreen());
+      CustomLoaders.successSnackBar(
+        title: "Your Account Created Successfully",
+        message: "Login to with your credentials to access doctors and book appointments anytime.",
+      );
+      Get.off(() => const LoginScreen());
+      // Get.off(() => const SignUpSuccessScreen());
     } catch (e) {
       CustomFullScreenLoader.closeLoadingDialog();
       CustomLoaders.errorSnackBar(

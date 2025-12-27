@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; // Import intl
+import 'package:intl/intl.dart';
+import 'package:veersa_health/common/loaders/shimmer_effect.dart';
 import 'package:veersa_health/features/home/controllers/home_controller.dart';
 import 'package:veersa_health/features/home/screens/home/widgets/upcoming_schedule_card.dart';
-import 'package:veersa_health/utils/constants/image_string_constants.dart';
+import 'package:veersa_health/features/my_appointments/screens/appointments/appointment_detail_screen.dart';
+import 'package:veersa_health/utils/constants/color_constants.dart';
 
 class UpcomingScheduleList extends StatelessWidget {
   const UpcomingScheduleList({super.key});
@@ -13,8 +15,9 @@ class UpcomingScheduleList extends StatelessWidget {
     final controller = Get.find<HomeController>();
 
     return Obx(() {
-      if (controller.isDataLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+      if (controller.isFetchingLocation.value ||
+          controller.isDataLoading.value) {
+        return const CustomShimmerEffect(width: double.infinity, height: 160);
       }
 
       if (controller.upcomingAppointments.isEmpty) {
@@ -22,10 +25,15 @@ class UpcomingScheduleList extends StatelessWidget {
           height: 100,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: ColorConstants.primaryBrandColor,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Center(child: Text("No upcoming appointments")),
+          child: const Center(
+            child: Text(
+              "No upcoming appointments",
+              style: TextStyle(color: ColorConstants.backgroundColor),
+            ),
+          ),
         );
       }
 
@@ -37,19 +45,27 @@ class UpcomingScheduleList extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 16),
           itemBuilder: (context, index) {
             final appt = controller.upcomingAppointments[index];
-            
-            // Format Date: "Sat, 27 Dec"
-            final dateStr = DateFormat('EEE, d MMM').format(appt.startTime);
-            // Format Time: "10:30 AM"
+
+            final dateStr = DateFormat(
+              'EEEE, d MMM, yy',
+            ).format(appt.startTime);
+
             final timeStr = DateFormat('jm').format(appt.startTime);
 
             return UpcomingScheduleCard(
-              doctorName: "Dr. ID: ${appt.doctorId}", // Backend doesn't give name in Appt API
-              doctorSpeciality: "Consultation",
+              doctorName: appt.doctorName,
+              doctorSpeciality: appt.specialty,
               dateOfAppointment: dateStr,
               timeOfAppointment: timeStr,
-              doctorProfileImage: ImageStringsConstants.avatar2,
-              clinicLocation: "Veersa Clinic", // Placeholder
+              doctorProfileImage: appt.doctorImage,
+
+              onMapTap: () {
+                controller.launchMapUrl(appt.mapUrl);
+              },
+
+              onCardTap: () {
+                Get.to(() => const AppointmentDetailScreen(), arguments: appt);
+              },
             );
           },
         ),
