@@ -33,11 +33,7 @@ class FirebaseConfig(
         }
 
         try {
-            /**
-             * 🔑 CRITICAL FIX
-             * Convert escaped \\n into real newlines
-             * This is REQUIRED when loading Firebase credentials from env / properties
-             */
+
             val fixedJson = firebaseServiceAccountJson
                 .trim()
                 .replace("\\n", "\n")
@@ -54,10 +50,10 @@ class FirebaseConfig(
 
             FirebaseApp.initializeApp(options)
 
-            log.info("✅ Firebase initialized successfully")
+            log.info(" Firebase initialized successfully")
 
         } catch (ex: Exception) {
-            log.error("❌ Failed to initialize Firebase", ex)
+            log.error(" Failed to initialize Firebase", ex)
             throw ex
         }
     }

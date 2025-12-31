@@ -29,9 +29,7 @@ class DoctorSearchRepositoryImpl(
         val nearQuery = NearQuery.near(
             GeoJsonPoint(longitude, latitude)
         )
-            // maxDistance must be in RADIANS
             .maxDistance(maxDistanceKm / earthRadiusKm)
-            // 🔥 THIS is where distance is converted
             .distanceMultiplier(earthRadiusKm)
             .query(
                 Query(
@@ -44,7 +42,7 @@ class DoctorSearchRepositoryImpl(
 
         val geoNearStage = Aggregation.geoNear(
             nearQuery,
-            "distanceInKm"   // already in KM
+            "distanceInKm"
         )
 
         val projectStage = project()
